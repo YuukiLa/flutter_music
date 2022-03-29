@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:unknown/page/play_list/widgets/playlist.dart';
 
 import 'play_list_logic.dart';
 
@@ -13,7 +14,7 @@ class PlayListPage extends GetView<PlayListLogic> {
       ),
       body: TabBarView(
         children: [
-          Center(child: Text("1"),),
+          PlaylistWidget(),
           Center(child: Text("2"),)
         ],
         controller: controller.tabController,

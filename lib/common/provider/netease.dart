@@ -3,10 +3,11 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
+import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
 
 class Netease {
-  static showPlaylist(String url) async {
+  static Future<List<Playlist>?> showPlaylist(String url) async {
     const order = 'hot';
     print(url);
 
@@ -29,16 +30,18 @@ class Netease {
     var response = await Dio().get(target_url);
     Document doc = parse(response.data);
     var children = doc.getElementsByClassName("m-cvrlst")[0].children;
-    var result = children.map((item) => {
-      "cover_img_url": item.getElementsByTagName("img")[0].attributes["src"],
-      "title": item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["title"],
-      "id" : "neplaylist_${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"]??"")}",
-      "source_url":"https://music.163.com/#/playlist?id=${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"]??"")}"
-    });
-    print(result);
+    var result = children.map((item) =>
+      Playlist(item.getElementsByTagName("img")[0].attributes["src"]??"",
+          item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["title"]??"",
+          "neplaylist_${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"]??"")}",
+          "https://music.163.com/#/playlist?id=${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"]??"")}")
+    ).toList();
+    return result;
   }
 
-  static ne_show_toplist(int offset) {}
+  static Future<List<Playlist>> ne_show_toplist(int offset) async {
+    return [];
+  }
 
   static PlaylistFilter playlistFilter() {
     var recommend = [

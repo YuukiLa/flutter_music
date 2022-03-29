@@ -1,6 +1,7 @@
 
 import 'package:get/get.dart';
 import 'package:unknown/common/enums/platform.dart';
+import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/provider/netease.dart';
 
 class MediaController extends GetxController {
@@ -13,9 +14,9 @@ class MediaController extends GetxController {
     return arr.join("&");
   }
 
-  void showPlaylistArray(Platform source,int offset,String filterID) {
+  Future<List<Playlist>?> showPlaylistArray(Platform source,int offset,String filterID) async{
     var url = "/show_playlist?${queryStringify({ "offset": offset.toString(), "filter_id": filterID })}";
-    Netease.showPlaylist(url);
+    return await Netease.showPlaylist(url);
   }
 
 
