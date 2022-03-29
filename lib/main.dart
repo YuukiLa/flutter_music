@@ -5,7 +5,10 @@ import 'package:unknown/common/route/app_routes.dart';
 import 'package:unknown/page/main/main_view.dart';
 import 'package:unknown/test/test_page.dart';
 
-void main() {
+import 'global.dart';
+
+Future<void> main() async {
+  await Global.init();
   runApp(const MyApp());
 }
 
@@ -16,7 +19,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Flutter Demo',
+      title: 'unknown',
+      debugShowCheckedModeBanner: false,
       getPages: AppPages.pages(),
       initialRoute: AppRoutes.INITIAL,
       theme: ThemeData(

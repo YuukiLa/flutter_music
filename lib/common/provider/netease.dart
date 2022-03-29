@@ -1,9 +1,44 @@
+import 'package:dio/dio.dart';
+import 'package:html/dom.dart';
+import 'package:html/parser.dart';
 import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
 
 class Netease {
+  static showPlaylist(String url) async {
+    const order = 'hot';
+    print(url);
 
+    var offset =  int.parse(getUrlParams('offset', url)?? "1");
+    var filterId = getUrlParams('filter_id', url);
+
+    if (filterId == 'toplist') {
+      return ne_show_toplist(offset);
+    }
+    var filter = '';
+    if (filterId != '') {
+      filter = "&cat=$filterId";
+    }
+    var target_url = '';
+    if (offset != "") {
+      target_url = "https://music.163.com/discover/playlist/?order=$order$filter&limit=35&offset=$offset";
+    } else {
+      target_url = "https://music.163.com/discover/playlist/?order=$order$filter";
+    }
+    var response = await Dio().get(target_url);
+    Document doc = parse(response.data);
+    var children = doc.getElementsByClassName("m-cvrlst")[0].children;
+    var result = children.map((item) => {
+      "cover_img_url": item.getElementsByTagName("img")[0].attributes["src"],
+      "title": item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["title"],
+      "id" : "neplaylist_${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"]??"")}",
+      "source_url":"https://music.163.com/#/playlist?id=${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"]??"")}"
+    });
+    print(result);
+  }
+
+  static ne_show_toplist(int offset) {}
 
   static PlaylistFilter playlistFilter() {
     var recommend = [
@@ -99,6 +134,14 @@ class Netease {
         Filter("00后", "00后")
       ]),
     ];
-    return PlaylistFilter(recommend,all);
+    return PlaylistFilter(recommend, all);
+  }
+
+  static String? getUrlParams(String key, String url) {
+    if (url == "") {
+      return null;
+    }
+    var parse = Uri.parse(url);
+    return parse.queryParameters[key];
   }
 }
