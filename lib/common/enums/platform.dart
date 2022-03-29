@@ -1,0 +1,5 @@
+
+enum Platform {
+  NETEASE,
+  QQ
+}
