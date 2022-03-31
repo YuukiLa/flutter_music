@@ -18,49 +18,62 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: SmartRefresher(
-          controller: controller.refreshController,
-          onRefresh: controller.onRefresh,
-          onLoading: controller.onLoading,
-          enablePullUp: true,
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Container(
-                  height: 40,
-                  child: ListView.builder(
-                    itemBuilder: _buildTag,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.filter.recommend.length,
-                  ),
-                )
-              ),
-              Obx(() {
-                if (controller.state.playlist.isEmpty) {
-                  return SliverToBoxAdapter(
+    return Obx(() {
+      return Container(
+        child: SmartRefresher(
+            controller: controller.refreshController,
+            onRefresh: controller.onRefresh,
+            onLoading: controller.onLoading,
+            enablePullUp: true,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
                     child: Container(
-                      child: Text("这里放标签"),
-                    ),
-                  );
-                }
-                return SliverWaterfallFlow(
+                      height: 40,
+                      child: ListView.separated(
+                        itemBuilder: _buildTag,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: controller.filter.recommend.length,
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const VerticalDivider(
+                            width: 10,
+                            color: Colors.transparent,
+                          );
+                        },
+                      ),
+                    )
+                ),
+
+                // if (controller.state.playlist.isEmpty) {
+                //   return SliverToBoxAdapter(
+                //     child: Container(
+                //       child: Text("这里放标签"),
+                //     ),
+                //   );
+                // }
+                SliverWaterfallFlow(
                   delegate: SliverChildBuilderDelegate(_buildItem,
                       childCount: controller.state.playlist.length),
                   gridDelegate:
-                      const SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+                  const SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 5.0,
                     mainAxisSpacing: 5.0,
                   ),
-                );
-              })
-            ],
-          )),
-    );
+
+                )
+              ],
+            )),
+      );
+    });
   }
   Widget _buildTag(BuildContext context, int index) {
-    return Text(controller.filter.recommend[index].name);
+    return Obx(() {
+      return FilterChip(
+        label: Text(controller.filter.recommend[index].name),
+        selected: controller.state.currFilter.value==index,
+        onSelected: (bool value) { controller.state.currFilter.value=index; },);
+    });
   }
   Widget _buildItem(BuildContext context, int index) {
     return GestureDetector(
