@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/service/media_service.dart';
@@ -13,6 +14,7 @@ class PlayListLogic extends GetxController with GetSingleTickerProviderStateMixi
 
   late final List<Tab> tabs;
   late final TabController tabController;
+  late final RefreshController refreshController;
 
   showPlaylist() async {
 
@@ -29,6 +31,7 @@ class PlayListLogic extends GetxController with GetSingleTickerProviderStateMixi
       const Tab(text: "qq音乐"),
     ];
     tabController = TabController(length: tabs.length, vsync: this);
+    refreshController = RefreshController();
     showPlaylist();
   }
 
