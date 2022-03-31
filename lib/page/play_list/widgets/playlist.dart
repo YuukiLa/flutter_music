@@ -21,12 +21,20 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     return Container(
       child: SmartRefresher(
           controller: controller.refreshController,
+          onRefresh: controller.onRefresh,
+          onLoading: controller.onLoading,
+          enablePullUp: true,
           child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
                 child: Container(
-                  child: Text("这里放标签"),
-                ),
+                  height: 40,
+                  child: ListView.builder(
+                    itemBuilder: _buildTag,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: controller.filter.recommend.length,
+                  ),
+                )
               ),
               Obx(() {
                 if (controller.state.playlist.isEmpty) {
@@ -37,18 +45,13 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                   );
                 }
                 return SliverWaterfallFlow(
-                  delegate: SliverChildBuilderDelegate(_buildItem),
+                  delegate: SliverChildBuilderDelegate(_buildItem,
+                      childCount: controller.state.playlist.length),
                   gridDelegate:
-                      SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+                      const SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 5.0,
                     mainAxisSpacing: 5.0,
-                    collectGarbage: (List<int> garbages) {
-                      print('collect garbage : $garbages');
-                    },
-                    viewportBuilder: (int firstIndex, int lastIndex) {
-                      print('viewport : [$firstIndex,$lastIndex]');
-                    },
                   ),
                 );
               })
@@ -56,7 +59,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           )),
     );
   }
-
+  Widget _buildTag(BuildContext context, int index) {
+    return Text(controller.filter.recommend[index].name);
+  }
   Widget _buildItem(BuildContext context, int index) {
     return GestureDetector(
         child: Container(
