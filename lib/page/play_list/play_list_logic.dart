@@ -7,6 +7,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/provider/netease.dart';
+import 'package:unknown/common/route/app_routes.dart';
 import 'package:unknown/common/service/media_service.dart';
 import 'package:unknown/page/play_list/play_list_index.dart';
 
@@ -45,6 +46,11 @@ class PlayListLogic extends GetxController
 
   void onPlaylistTap(int index) {
     print(index);
+    var playlist = state.playlist[index];
+    Get.toNamed(AppRoutes.SONG_LIST,arguments: {
+      "title": playlist.title,
+      "image": playlist.coverImgUrl
+    });
   }
   Future<void> onRefresh() async {
     state.currPage.value = 0;

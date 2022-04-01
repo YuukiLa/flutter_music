@@ -14,11 +14,11 @@ class Global {
     if (GetPlatform.isAndroid) {
       SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarDividerColor: Colors.transparent,
-        systemNavigationBarColor: Colors.white,
-        systemNavigationBarIconBrightness: Brightness.dark,
+        // statusBarBrightness: Brightness.light,
+        // statusBarIconBrightness: Brightness.dark,
+        // systemNavigationBarDividerColor: Colors.transparent,
+        // systemNavigationBarColor: Colors.white,
+        // systemNavigationBarIconBrightness: Brightness.dark,
       );
       SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
     }

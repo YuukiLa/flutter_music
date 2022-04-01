@@ -10,6 +10,7 @@ class PlayListPage extends GetView<PlayListLogic> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: TabBar(
+        isScrollable: true,
         tabs: controller.tabs,
         controller: controller.tabController,
       ),

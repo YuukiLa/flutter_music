@@ -30,6 +30,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 SliverToBoxAdapter(
                     child: Container(
                       height: 40,
+                      margin: const EdgeInsets.fromLTRB(2, 5, 2, 5),
                       child: ListView.separated(
                         itemBuilder: _buildTag,
                         scrollDirection: Axis.horizontal,
@@ -69,7 +70,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   }
   Widget _buildTag(BuildContext context, int index) {
     return Obx(() {
-      return FilterChip(
+      return ChoiceChip(
         label: Text(controller.filter.recommend[index].name),
         selected: controller.state.currFilter.value==index,
         onSelected: (bool value) { controller.state.currFilter.value=index; },);
@@ -77,6 +78,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   }
   Widget _buildItem(BuildContext context, int index) {
     return GestureDetector(
+      onTap: ()=> controller.onPlaylistTap(index),
         child: Container(
       padding: const EdgeInsets.all(5.0),
       child: Column(
