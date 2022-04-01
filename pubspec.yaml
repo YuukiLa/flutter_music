@@ -42,6 +42,8 @@ dependencies:
   waterfall_flow: any
   pull_to_refresh: ^2.0.0
   flutter_easyloading: ^3.0.3
+  cryptography: ^2.0.5
+  cryptography_flutter: ^2.0.2
 
 dev_dependencies:
   flutter_test:

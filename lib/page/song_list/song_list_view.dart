@@ -38,7 +38,7 @@ class SongListPage extends GetView<SongListLogic> {
         centerTitle: true,
         titleSpacing: 0,
         elevation: 0,
-        toolbarHeight: 80,
+        toolbarHeight: 100,
         title: Obx(() {
           return Opacity(
             opacity: controller.state.appBarAlpha.value,

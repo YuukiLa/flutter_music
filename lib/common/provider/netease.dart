@@ -1,17 +1,25 @@
+import 'dart:convert';
+
+import 'package:cryptography/cryptography.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
+import 'dart:math';
 
 class Netease {
+
+  static const channel = const MethodChannel('unknown/neteaseEnc');
+
   static Future<List<Playlist>?> showPlaylist(String url) async {
     const order = 'hot';
     print(url);
 
-    var offset =  int.parse(getUrlParams('offset', url)?? "1");
+    var offset = int.parse(getUrlParams('offset', url) ?? "1");
     var filterId = getUrlParams('filter_id', url);
 
     if (filterId == 'toplist') {
@@ -23,24 +31,65 @@ class Netease {
     }
     var target_url = '';
     if (offset != "") {
-      target_url = "https://music.163.com/discover/playlist/?order=$order$filter&limit=35&offset=$offset";
+      target_url =
+          "https://music.163.com/discover/playlist/?order=$order$filter&limit=35&offset=$offset";
     } else {
-      target_url = "https://music.163.com/discover/playlist/?order=$order$filter";
+      target_url =
+          "https://music.163.com/discover/playlist/?order=$order$filter";
     }
     var response = await Dio().get(target_url);
     Document doc = parse(response.data);
     var children = doc.getElementsByClassName("m-cvrlst")[0].children;
-    var result = children.map((item) =>
-      Playlist(item.getElementsByTagName("img")[0].attributes["src"]??"",
-          item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["title"]??"",
-          "neplaylist_${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"]??"")}",
-          "https://music.163.com/#/playlist?id=${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"]??"")}")
-    ).toList();
+    var result = children
+        .map((item) => Playlist(
+            item.getElementsByTagName("img")[0].attributes["src"] ?? "",
+            item
+                    .getElementsByTagName('div')[0]
+                    .getElementsByTagName('a')[0]
+                    .attributes["title"] ??
+                "",
+            "neplaylist_${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"] ?? "")}",
+            "https://music.163.com/#/playlist?id=${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"] ?? "")}"))
+        .toList();
     return result;
   }
 
   static Future<List<Playlist>> ne_show_toplist(int offset) async {
     return [];
+  }
+
+  static weapi(text) async {
+    // const modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b72' +
+    //     '5152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbd' +
+    //     'a92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe48' +
+    //     '75d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7';
+    // const nonce = '0CoJUm6Qyw8W8jud';
+    // const pubKey = '010001';
+    // var sec_key = _create_secret_key(16);
+    // var enc_text = await _aes_encrypt(text, nonce, 'AES-CBC');
+    // enc_text = await _aes_encrypt(enc_text, sec_key, 'AES-CBC');
+    var result = await channel.invokeMethod("neteaseAesEnc");
+    print("result=$result");
+  }
+  static Future<String> _aes_encrypt(String text, String sec_key, String algo) async {
+    AesCbc aes = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
+    var encrypt = await aes.encrypt(utf8.encode(text), secretKey: SecretKey(utf8.encode(sec_key)));
+    return utf8.decode(encrypt.cipherText);
+  }
+  static _rsa_encrypt(String text, String pubKey, String modulus) async {
+    text = text.split("").reversed.join("");
+    final algorithm = RsaPss(Sha256());
+    // BigInt.from();
+
+  }
+  static _create_secret_key(int size) {
+    const result = [];
+    var choice = '012345679abcdef'.split('');
+    for (var i = 0; i < size; i += 1) {
+      var index = (Random.secure().nextDouble() * choice.length).truncate();
+      result.add(choice[index]);
+    }
+    return result.join('');
   }
 
   static PlaylistFilter playlistFilter() {
