@@ -10,6 +10,7 @@ import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
 import 'dart:math';
+import 'dart:convert' as convert;
 
 class Netease {
 
@@ -58,38 +59,81 @@ class Netease {
     return [];
   }
 
-  static weapi(text) async {
-    // const modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b72' +
-    //     '5152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbd' +
-    //     'a92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe48' +
-    //     '75d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7';
-    // const nonce = '0CoJUm6Qyw8W8jud';
-    // const pubKey = '010001';
-    // var sec_key = _create_secret_key(16);
-    // var enc_text = await _aes_encrypt(text, nonce, 'AES-CBC');
-    // enc_text = await _aes_encrypt(enc_text, sec_key, 'AES-CBC');
-    var result = await channel.invokeMethod("neteaseAesEnc");
-    print("result=$result");
-  }
-  static Future<String> _aes_encrypt(String text, String sec_key, String algo) async {
-    AesCbc aes = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
-    var encrypt = await aes.encrypt(utf8.encode(text), secretKey: SecretKey(utf8.encode(sec_key)));
-    return utf8.decode(encrypt.cipherText);
-  }
-  static _rsa_encrypt(String text, String pubKey, String modulus) async {
-    text = text.split("").reversed.join("");
-    final algorithm = RsaPss(Sha256());
-    // BigInt.from();
-
-  }
-  static _create_secret_key(int size) {
-    const result = [];
-    var choice = '012345679abcdef'.split('');
-    for (var i = 0; i < size; i += 1) {
-      var index = (Random.secure().nextDouble() * choice.length).truncate();
-      result.add(choice[index]);
+  static getPlaylist(String url) {
+    print(url);
+    var list_id = getUrlParams('list_id', url)?.split('_').first;
+    switch (list_id) {
+      case 'neplaylist':
+        return ne_get_playlist(url);
+      // case 'nealbum':
+      //   return this.ne_album(url);
+      // case 'neartist':
+      //   return this.ne_artist(url);
+      default:
+        return null;
     }
-    return result.join('');
+  }
+
+  static ne_get_playlist(String url) async {
+    var list_id = getUrlParams('list_id', url)?.split('_').last;
+    const target_url = 'https://music.163.com/weapi/v3/playlist/detail';
+    print(list_id);
+    var d = {
+      "id": list_id,
+      "offset": 0,
+      "total": true,
+      "limit": 1000,
+      "n": 1000,
+      "csrf_token": ''
+    };
+    var req = await weapi(convert.jsonEncode(d));
+    var resp = await Dio(BaseOptions(headers: {
+      "Referer": "http://music.163.com",
+      "Origin": "http://music.163.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+      "Content-Type": "application/x-www-form-urlencoded"
+    })).post(target_url,data: req);
+    print(resp.data);
+  }
+
+
+  static weapi(text) async {
+    var modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b72' +
+        '5152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbd' +
+        'a92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe48' +
+        '75d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7';
+    var nonce = '0CoJUm6Qyw8W8jud';
+    var pubKey = '010001';
+    var sec_key = _create_secret_key(16);
+    var aes = await channel.invokeMethod("neteaseAesEnc",{"text":text,"key":nonce});
+    aes = await channel.invokeMethod("neteaseAesEnc",{"text":aes,"key":sec_key});
+    var rsa = await channel.invokeMethod("neteaseRsaEnc",{"text":sec_key,"pubKey":pubKey,"modulus":modulus});
+    print("aes:$aes,rsa:$rsa");
+    return {
+      "params": aes,
+      "encSecKey":rsa
+    };
+  }
+  // static Future<String> _aes_encrypt(String text, String sec_key, String algo) async {
+  //   AesCbc aes = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
+  //   var encrypt = await aes.encrypt(utf8.encode(text), secretKey: SecretKey(utf8.encode(sec_key)));
+  //   return utf8.decode(encrypt.cipherText);
+  // }
+  // static _rsa_encrypt(String text, String pubKey, String modulus) async {
+  //   text = text.split("").reversed.join("");
+  //   final algorithm = RsaPss(Sha256());
+  //   // BigInt.from();
+  //
+  // }
+  static _create_secret_key(int size) {
+    final _random = Random();
+    const _availableChars =
+        '0123456789abcdef';
+    final randomString = List.generate(size,
+            (index) => _availableChars[_random.nextInt(_availableChars.length)])
+        .join();
+
+    return randomString;
   }
 
   static PlaylistFilter playlistFilter() {
