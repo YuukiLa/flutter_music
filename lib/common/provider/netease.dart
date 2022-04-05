@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:dartx/dartx.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
@@ -13,7 +14,6 @@ import 'dart:math';
 import 'dart:convert' as convert;
 
 class Netease {
-
   static const channel = const MethodChannel('unknown/neteaseEnc');
 
   static Future<List<Playlist>?> showPlaylist(String url) async {
@@ -74,7 +74,7 @@ class Netease {
     }
   }
 
-  static ne_get_playlist(String url) async {
+  static Future<Map<String, dynamic>> ne_get_playlist(String url) async {
     var list_id = getUrlParams('list_id', url)?.split('_').last;
     const target_url = 'https://music.163.com/weapi/v3/playlist/detail';
     print(list_id);
@@ -90,12 +90,24 @@ class Netease {
     var resp = await Dio(BaseOptions(headers: {
       "Referer": "http://music.163.com",
       "Origin": "http://music.163.com",
-      "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
       "Content-Type": "application/x-www-form-urlencoded"
-    })).post(target_url,data: req);
-    print(resp.data);
+    })).post(target_url, data: req);
+    Map<String,dynamic> data = convert.jsonDecode(resp.data);
+    var info = {
+      "id": "neplaylist_$list_id",
+      "cover_img_url": data["playlist"]["coverImgUrl"],
+      "title": data["playlist"]["name"],
+      "source_url": "https://music.163.com/#/playlist?id=$list_id"
+    };
+    var trackIdsArray = split_array(data["playlist"]["trackIds"], 1000);
+    var tracks = [];
+    for (var id in trackIdsArray) {
+      tracks.addAll(await ng_parse_playlist_tracks(id));
+    }
+    return {"tracks": tracks, "info": info};
   }
-
 
   static weapi(text) async {
     var modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b72' +
@@ -105,15 +117,62 @@ class Netease {
     var nonce = '0CoJUm6Qyw8W8jud';
     var pubKey = '010001';
     var sec_key = _create_secret_key(16);
-    var aes = await channel.invokeMethod("neteaseAesEnc",{"text":text,"key":nonce});
-    aes = await channel.invokeMethod("neteaseAesEnc",{"text":aes,"key":sec_key});
-    var rsa = await channel.invokeMethod("neteaseRsaEnc",{"text":sec_key,"pubKey":pubKey,"modulus":modulus});
-    print("aes:$aes,rsa:$rsa");
-    return {
-      "params": aes,
-      "encSecKey":rsa
-    };
+    var aes = await channel
+        .invokeMethod("neteaseAesEnc", {"text": text, "key": nonce});
+    aes = await channel
+        .invokeMethod("neteaseAesEnc", {"text": aes, "key": sec_key});
+    var rsa = await channel.invokeMethod("neteaseRsaEnc",
+        {"text": sec_key, "pubKey": pubKey, "modulus": modulus});
+    return {"params": aes, "encSecKey": rsa};
   }
+
+  static List<dynamic> split_array(List<dynamic> myarray, int size) {
+    var count = (myarray.length / size).ceil();
+    var result = [];
+    for (var i = 0; i < count; i += 1) {
+      if(myarray.length<size) {
+        result.add(myarray);
+      }else {
+        result.add(myarray.slice(i * size, (i + 1) * size));
+      }
+
+    }
+    return result;
+  }
+
+  static ng_parse_playlist_tracks(List<dynamic> playlist_tracks) async {
+    const target_url = 'https://music.163.com/weapi/v3/song/detail';
+    var track_ids = playlist_tracks.map((i) => i["id"]);
+    var d = {
+      "c": "[${track_ids.map((id) => '{"id":$id}').join(',')}]",
+      "ids": "[${track_ids.join(',')}]"
+    };
+    var data = await weapi(convert.jsonEncode(d));
+    var response = await Dio(BaseOptions(headers: {
+      "Referer": "http://music.163.com",
+      "Origin": "http://music.163.com",
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+      "Content-Type": "application/x-www-form-urlencoded"
+    })).post(target_url, data: data);
+    var res = convert.jsonDecode(response.data);
+    var songs = res["songs"] as List<dynamic>;
+    print(res);
+    print(songs.length);
+    var tracks = songs.map((track_json) => {
+          "id": "netrack_${track_json["id"]}",
+          "title": track_json["name"],
+          "artist": track_json["ar"][0]["name"],
+          "artist_id": "neartist_${track_json["ar"][0]["id"]}",
+          "album": track_json["al"]["name"],
+          "album_id": "nealbum_${track_json["al"]["id"]}",
+          "source": 'netease',
+          "source_url": "https://music.163.com/#/song?id=${track_json["id"]}",
+          "img_url": track_json["al"]["picUrl"]
+        });
+    return tracks;
+  }
+
   // static Future<String> _aes_encrypt(String text, String sec_key, String algo) async {
   //   AesCbc aes = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
   //   var encrypt = await aes.encrypt(utf8.encode(text), secretKey: SecretKey(utf8.encode(sec_key)));
@@ -127,8 +186,7 @@ class Netease {
   // }
   static _create_secret_key(int size) {
     final _random = Random();
-    const _availableChars =
-        '0123456789abcdef';
+    const _availableChars = '0123456789abcdef';
     final randomString = List.generate(size,
             (index) => _availableChars[_random.nextInt(_availableChars.length)])
         .join();

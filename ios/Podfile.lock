@@ -1,11 +1,23 @@
 PODS:
+  - BigInt (3.1.0):
+    - SipHash (~> 1.2)
   - cryptography_flutter (0.1.0):
     - Flutter
+  - CryptoSwift (1.4.3)
   - Flutter (1.0.0)
+  - SipHash (1.2.2)
 
 DEPENDENCIES:
+  - BigInt (~> 3.1)
   - cryptography_flutter (from `.symlinks/plugins/cryptography_flutter/ios`)
+  - CryptoSwift (~> 1.4)
   - Flutter (from `Flutter`)
+
+SPEC REPOS:
+  trunk:
+    - BigInt
+    - CryptoSwift
+    - SipHash
 
 EXTERNAL SOURCES:
   cryptography_flutter:
@@ -14,9 +26,12 @@ EXTERNAL SOURCES:
     :path: Flutter
 
 SPEC CHECKSUMS:
+  BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
   cryptography_flutter: a2c541ba25ff28549f989f856dde126c961defcd
+  CryptoSwift: a0799ee936271bd2253a006f1e4523df21845000
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: e99d31a5e71197471ea96add7fa2fd773e3005dc
 
 COCOAPODS: 1.11.3

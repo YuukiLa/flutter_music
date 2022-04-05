@@ -65,11 +65,16 @@ class SongListPage extends GetView<SongListLogic> {
                           shrinkWrap: true,
                           children: [
                             Container(
-                              height: 300,
-                              child: Image.network(
-                                controller.state.image.value,
-                                fit: BoxFit.cover,
-                              ),
+                              height: 400,
+                              child: Obx((){
+                                if(controller.state.image.value=="") {
+                                  return SizedBox(height: 400,);
+                                }
+                                return Image.network(
+                                  controller.state.image.value,
+                                  fit: BoxFit.cover,
+                                );
+                              }),
                             )
                           ],
                         ))

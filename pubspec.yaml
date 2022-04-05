@@ -44,6 +44,7 @@ dependencies:
   flutter_easyloading: ^3.0.3
   cryptography: ^2.0.5
   cryptography_flutter: ^2.0.2
+  dartx: any
 
 dev_dependencies:
   flutter_test:

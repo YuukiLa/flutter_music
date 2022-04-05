@@ -46,13 +46,12 @@ class PlayListLogic extends GetxController
 
   void onPlaylistTap(int index) {
     // Netease.weapi("text");
-    Netease.getPlaylist("/playlist?list_id=${state.playlist[index].id}");
+    // Netease.getPlaylist("/playlist?list_id=${state.playlist[index].id}");
     // print(index);
-    // var playlist = state.playlist[index];
-    // Get.toNamed(AppRoutes.SONG_LIST,arguments: {
-    //   "title": playlist.title,
-    //   "image": playlist.coverImgUrl
-    // });
+    var playlist = state.playlist[index];
+    Get.toNamed(AppRoutes.SONG_LIST,arguments: {
+      "id": state.playlist[index].id
+    });
   }
   Future<void> onRefresh() async {
     state.currPage.value = 0;
