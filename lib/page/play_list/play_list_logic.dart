@@ -25,6 +25,7 @@ class PlayListLogic extends GetxController
   showPlaylist(bool isRefresh) async {
     var result =
         await MediaController.to.showPlaylistArray(Platform.NETEASE, state.currPage.value*35, "流行");
+    print(result);
     if(isRefresh) {
       state.playlist.clear();
     }

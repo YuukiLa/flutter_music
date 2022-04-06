@@ -14,7 +14,14 @@ import 'dart:math';
 import 'dart:convert' as convert;
 
 class Netease {
-  static const channel = const MethodChannel('unknown/neteaseEnc');
+  static const channel = MethodChannel('unknown/neteaseEnc');
+  static final dio = Dio(BaseOptions(headers: {
+    "Referer": "http://music.163.com",
+    "Origin": "http://music.163.com",
+    "User-Agent":
+    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+    "Content-Type": "application/x-www-form-urlencoded"
+  }));
 
   static Future<List<Playlist>?> showPlaylist(String url) async {
     const order = 'hot';
@@ -38,7 +45,7 @@ class Netease {
       target_url =
           "https://music.163.com/discover/playlist/?order=$order$filter";
     }
-    var response = await Dio().get(target_url);
+    var response = await dio.get(target_url);
     Document doc = parse(response.data);
     var children = doc.getElementsByClassName("m-cvrlst")[0].children;
     var result = children
@@ -87,13 +94,7 @@ class Netease {
       "csrf_token": ''
     };
     var req = await weapi(convert.jsonEncode(d));
-    var resp = await Dio(BaseOptions(headers: {
-      "Referer": "http://music.163.com",
-      "Origin": "http://music.163.com",
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
-      "Content-Type": "application/x-www-form-urlencoded"
-    })).post(target_url, data: req);
+    var resp = await dio.post(target_url, data: req);
     Map<String,dynamic> data = convert.jsonDecode(resp.data);
     var info = {
       "id": "neplaylist_$list_id",
@@ -148,13 +149,7 @@ class Netease {
       "ids": "[${track_ids.join(',')}]"
     };
     var data = await weapi(convert.jsonEncode(d));
-    var response = await Dio(BaseOptions(headers: {
-      "Referer": "http://music.163.com",
-      "Origin": "http://music.163.com",
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
-      "Content-Type": "application/x-www-form-urlencoded"
-    })).post(target_url, data: data);
+    var response = await dio.post(target_url, data: data);
     var res = convert.jsonDecode(response.data);
     var songs = res["songs"] as List<dynamic>;
     print(res);

@@ -36,4 +36,8 @@ class SongListLogic extends GetxController {
     }
     state.appBarAlpha.value = alpha;
   }
+
+  onSongClick(int index) {
+    print(index);
+  }
 }
