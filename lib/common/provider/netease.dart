@@ -1,6 +1,6 @@
-import 'dart:convert';
+import 'dart:convert' as convert;
+import 'dart:math';
 
-import 'package:cryptography/cryptography.dart';
 import 'package:dartx/dartx.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
@@ -10,8 +10,6 @@ import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
-import 'dart:math';
-import 'dart:convert' as convert;
 
 class Netease {
   static const channel = MethodChannel('unknown/neteaseEnc');

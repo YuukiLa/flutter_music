@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,19 +23,66 @@ class SongListPage extends GetView<SongListLogic> {
           headerSliverBuilder: _buildHeader,
           body: Obx(() {
             return Stack(
-                children: [
-                  ListView.separated(itemBuilder: _buildSongItem,
-                  separatorBuilder: (BuildContext context, int index) {
-                    return Container();
-                  }, itemCount: controller.state.songs.length),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                      child: null,
-                    ),
-                  ),
-                ],
+              children: [
+                ListView.separated(
+                    itemBuilder: _buildSongItem,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Container();
+                    },
+                    itemCount: controller.state.songs.length),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                      child: SizedBox(
+                        width: 250,
+                        height: 45,
+                        child: Card(
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(45))),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.collections_bookmark,size: 15,),
+                                      Text("收藏")
+                                    ],
+                                  ),
+                                )
+                              ),
+                              Expanded(
+                                  child: GestureDetector(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(Icons.play_arrow,size: 15,),
+                                        Text("播放全部")
+                                      ],
+                                    ),
+                                  )
+                              ),
+                              Expanded(
+                                  child: GestureDetector(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(Icons.chair,size: 15,),
+                                        Text("选择")
+                                      ],
+                                    ),
+                                  )
+                              ),
+                            ],
+                          ),
+                        ),
+                      )),
+                ),
+              ],
             );
           }),
         ),
@@ -54,7 +102,7 @@ class SongListPage extends GetView<SongListLogic> {
         centerTitle: true,
         titleSpacing: 0,
         elevation: 0,
-        toolbarHeight: 80,
+        toolbarHeight: 90,
         title: Obx(() {
           return Opacity(
             opacity: controller.state.appBarAlpha.value,
@@ -77,23 +125,25 @@ class SongListPage extends GetView<SongListLogic> {
                       children: [
                         Expanded(
                             child: ListView(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              children: [
-                                Container(
-                                  height: 400,
-                                  child: Obx(() {
-                                    if (controller.state.image.value == "") {
-                                      return SizedBox(height: 400,);
-                                    }
-                                    return Image.network(
-                                      controller.state.image.value,
-                                      fit: BoxFit.cover,
-                                    );
-                                  }),
-                                )
-                              ],
-                            )),
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          children: [
+                            Container(
+                              height: 400,
+                              child: Obx(() {
+                                if (controller.state.image.value == "") {
+                                  return const SizedBox(
+                                    height: 400,
+                                  );
+                                }
+                                return Image.network(
+                                  controller.state.image.value,
+                                  fit: BoxFit.cover,
+                                );
+                              }),
+                            )
+                          ],
+                        )),
                       ],
                     ),
                   )
@@ -118,31 +168,40 @@ class SongListPage extends GetView<SongListLogic> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadiusDirectional.circular(8)),
               clipBehavior: Clip.antiAlias,
-              child: Image.network(controller.state.songs[index]["img_url"],
-                  fit: BoxFit.cover),
+              child: CachedNetworkImage(
+                fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+                imageUrl: controller.state.songs[index]["img_url"],
+              ),
             ),
             const SizedBox(
               width: 7,
             ),
             Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(controller.state.songs[index]["title"],
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w300,
-                      ),),
-                    const SizedBox(
-                      height: 10,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  controller.state.songs[index]["title"],
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                  child: Text(
+                    controller.state.songs[index]["artist"],
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.black45,
                     ),
-                    Text(controller.state.songs[index]["artist"],
-                      style: const TextStyle(
-                          fontSize: 13,
-                          color: Colors.black45
-                      ),),
-                  ],
-                ))
+                  ),
+                ),
+              ],
+            ))
           ],
         ),
       ),
