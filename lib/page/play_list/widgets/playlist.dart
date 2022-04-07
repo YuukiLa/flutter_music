@@ -7,21 +7,24 @@ import 'package:unknown/page/play_list/play_list_index.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 class PlaylistWidget extends StatefulWidget {
-  const PlaylistWidget({Key? key}) : super(key: key);
+  late String platform;
+  PlaylistWidget({Key? key,required this.platform}) : super(key: key);
 
   @override
-  State<PlaylistWidget> createState() => _PlaylistWidgetState();
+  State<PlaylistWidget> createState() => _PlaylistWidgetState(platform);
 }
 
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   final controller = Get.find<PlayListLogic>();
+  late String platform;
+  _PlaylistWidgetState(this.platform);
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       return Container(
         child: SmartRefresher(
-            controller: controller.refreshController,
+            controller: controller.refreshControllerMap[platform]??RefreshController(),
             onRefresh: controller.onRefresh,
             onLoading: controller.onLoading,
             enablePullUp: true,
@@ -34,7 +37,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       child: ListView.separated(
                         itemBuilder: _buildTag,
                         scrollDirection: Axis.horizontal,
-                        itemCount: controller.filter.recommend.length,
+                        itemCount: controller.state.filter[platform]?.recommend.length??0,
                         separatorBuilder: (BuildContext context, int index) {
                           return const VerticalDivider(
                             width: 10,
@@ -71,7 +74,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   Widget _buildTag(BuildContext context, int index) {
     return Obx(() {
       return ChoiceChip(
-        label: Text(controller.filter.recommend[index].name),
+        label: Text(controller.state.filter[platform]?.recommend[index].name??""),
         selected: controller.state.currFilter.value==index,
         onSelected: (bool value) { controller.state.currFilter.value=index; },);
     });

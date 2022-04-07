@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/page/play_list/widgets/playlist.dart';
 
 import 'play_list_logic.dart';
@@ -16,12 +17,11 @@ class PlayListPage extends GetView<PlayListLogic> {
       ),
       body: TabBarView(
         children: [
-          PlaylistWidget(),
-          Center(
-            child: Text("2"),
-          )
+          PlaylistWidget(platform: Platform.Netease,),
+          PlaylistWidget(platform: Platform.QQ,),
         ],
         controller: controller.tabController,
+
       ),
     );
   }

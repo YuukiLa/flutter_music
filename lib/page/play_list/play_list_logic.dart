@@ -16,17 +16,17 @@ import '../../common/model/playlist_filter.dart';
 class PlayListLogic extends GetxController
     with GetSingleTickerProviderStateMixin {
   final PlayListState state = PlayListState();
-
+  final List<String> platforms = [Platform.Netease, Platform.QQ];
   late final List<Tab> tabs;
   late final TabController tabController;
+  late final Map<String, RefreshController> refreshControllerMap;
   late final RefreshController refreshController;
-  final PlaylistFilter filter = Netease.playlistFilter();
 
   showPlaylist(bool isRefresh) async {
-    var result =
-        await MediaController.to.showPlaylistArray(Platform.NETEASE, state.currPage.value*35, "流行");
-    print(result);
-    if(isRefresh) {
+    var result = await MediaController.to.showPlaylistArray(
+        platforms[state.currTab.value], state.currPage.value * 35, "流行");
+    // print(result);
+    if (isRefresh) {
       state.playlist.clear();
     }
     state.playlist.addAll(result!);
@@ -34,13 +34,24 @@ class PlayListLogic extends GetxController
 
   @override
   Future<void> onInit() async {
-    EasyLoading.showProgress(0.3, status: '加载中...',maskType: EasyLoadingMaskType.black);
+    EasyLoading.showProgress(0.3,
+        status: '加载中...', maskType: EasyLoadingMaskType.black);
     tabs = [
       const Tab(text: "网易云"),
       const Tab(text: "qq音乐"),
     ];
-    tabController = TabController(length: tabs.length, vsync: this);
-    refreshController = RefreshController();
+    tabController = TabController(length: tabs.length, vsync: this)
+      ..addListener(onTabChange);
+
+    refreshControllerMap = {
+      Platform.Netease: RefreshController(),
+      Platform.QQ: RefreshController()
+    };
+    // refreshController = RefreshController();
+    state.filter.value = {
+      Platform.Netease: await MediaController.to.getFilter(Platform.Netease),
+      Platform.QQ: await MediaController.to.getFilter(Platform.QQ)
+    };
     await showPlaylist(true);
     EasyLoading.dismiss();
   }
@@ -50,19 +61,23 @@ class PlayListLogic extends GetxController
     // Netease.getPlaylist("/playlist?list_id=${state.playlist[index].id}");
     // print(index);
     var playlist = state.playlist[index];
-    Get.toNamed(AppRoutes.SONG_LIST,arguments: {
-      "id": state.playlist[index].id
-    });
+    Get.toNamed(AppRoutes.SONG_LIST,
+        arguments: {"id": state.playlist[index].id});
   }
+
+  onTabChange() {
+    state.currTab.value = tabController.index;
+  }
+
   Future<void> onRefresh() async {
     state.currPage.value = 0;
     await showPlaylist(true);
     refreshController.refreshCompleted();
   }
+
   Future<void> onLoading() async {
     state.currPage.value++;
     await showPlaylist(false);
     refreshController.loadComplete();
   }
-
 }

@@ -10,10 +10,11 @@ import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
+import 'package:unknown/common/provider/abstract_provider.dart';
 
 import '../model/song.dart';
 
-class Netease {
+class Netease extends AbstractProvider{
   static const channel = MethodChannel('unknown/neteaseEnc');
   static final dio = Dio(BaseOptions(headers: {
     "Referer": "http://music.163.com",
@@ -23,7 +24,7 @@ class Netease {
     "Content-Type": "application/x-www-form-urlencoded"
   }));
 
-  static Future<List<Playlist>?> showPlaylist(String url) async {
+  Future<List<Playlist>?> showPlaylist(String url) async {
     const order = 'hot';
     print(url);
 
@@ -66,7 +67,7 @@ class Netease {
     return [];
   }
 
-  static getPlaylist(String url) {
+  getPlaylist(String url) {
     print(url);
     var list_id = getUrlParams('list_id', url)?.split('_').first;
     switch (list_id) {
@@ -168,7 +169,7 @@ class Netease {
         ));
     return tracks;
   }
-  static getSongUrl(String id) async {
+  getSongUrl(String id) async {
     id = id.split("_")[1];
     var data = {
       "ids": [id],
@@ -199,7 +200,7 @@ class Netease {
     return randomString;
   }
 
-  static PlaylistFilter playlistFilter() {
+  Future<PlaylistFilter>  playlistFilter() async{
     var recommend = [
       Filter("", "全部"),
       Filter("toplist", "排行榜"),

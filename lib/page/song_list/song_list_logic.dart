@@ -1,5 +1,7 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/enums/platform.dart';
+import 'package:unknown/common/service/media_service.dart';
 
 import '../../common/provider/netease.dart';
 import 'song_list_state.dart';
@@ -10,7 +12,7 @@ class SongListLogic extends GetxController {
 
   getSongList() async{
     EasyLoading.showProgress(0.3, status: '加载中...',maskType: EasyLoadingMaskType.black);
-    var res = await Netease.getPlaylist("/playlist?list_id=${state.id.value}");
+    var res = await MediaController.to.getPlaylistSongs(Platform.Netease,"/playlist?list_id=${state.id.value}");
     info = res["info"];
     state.title.value = info["title"];
     state.image.value = info["cover_img_url"];
@@ -38,7 +40,7 @@ class SongListLogic extends GetxController {
   }
 
   onSongClick(int index) {
-    Netease.getSongUrl(state.songs[index].id);
+    MediaController.to.getSongUrl(Platform.Netease,state.songs[index].id);
     print(index);
   }
 }
