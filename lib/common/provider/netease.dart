@@ -11,13 +11,15 @@ import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
 
+import '../model/song.dart';
+
 class Netease {
   static const channel = MethodChannel('unknown/neteaseEnc');
   static final dio = Dio(BaseOptions(headers: {
     "Referer": "http://music.163.com",
     "Origin": "http://music.163.com",
     "User-Agent":
-    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
     "Content-Type": "application/x-www-form-urlencoded"
   }));
 
@@ -93,7 +95,7 @@ class Netease {
     };
     var req = await weapi(convert.jsonEncode(d));
     var resp = await dio.post(target_url, data: req);
-    Map<String,dynamic> data = convert.jsonDecode(resp.data);
+    Map<String, dynamic> data = convert.jsonDecode(resp.data);
     var info = {
       "id": "neplaylist_$list_id",
       "cover_img_url": data["playlist"]["coverImgUrl"],
@@ -101,7 +103,7 @@ class Netease {
       "source_url": "https://music.163.com/#/playlist?id=$list_id"
     };
     var trackIdsArray = split_array(data["playlist"]["trackIds"], 1000);
-    var tracks = [];
+    var tracks = <Song>[];
     for (var id in trackIdsArray) {
       tracks.addAll(await ng_parse_playlist_tracks(id));
     }
@@ -129,12 +131,11 @@ class Netease {
     var count = (myarray.length / size).ceil();
     var result = [];
     for (var i = 0; i < count; i += 1) {
-      if(myarray.length<size) {
+      if (myarray.length < size) {
         result.add(myarray);
-      }else {
+      } else {
         result.add(myarray.slice(i * size, (i + 1) * size));
       }
-
     }
     return result;
   }
@@ -152,18 +153,29 @@ class Netease {
     var songs = res["songs"] as List<dynamic>;
     print(res);
     print(songs.length);
-    var tracks = songs.map((track_json) => {
-          "id": "netrack_${track_json["id"]}",
-          "title": track_json["name"],
-          "artist": track_json["ar"][0]["name"],
-          "artist_id": "neartist_${track_json["ar"][0]["id"]}",
-          "album": track_json["al"]["name"],
-          "album_id": "nealbum_${track_json["al"]["id"]}",
-          "source": 'netease',
-          "source_url": "https://music.163.com/#/song?id=${track_json["id"]}",
-          "img_url": track_json["al"]["picUrl"]
-        });
+    var tracks = songs.map((track_json) => Song(
+          "netrack_${track_json["id"]}",
+          track_json["name"],
+          track_json["ar"][0]["name"],
+          "neartist_${track_json["ar"][0]["id"]}",
+          track_json["al"]["name"],
+          "nealbum_${track_json["al"]["id"]}",
+          "https://music.163.com/#/song?id=${track_json["id"]}",
+          'netease',
+          track_json["al"]["picUrl"],
+          "",
+          false,
+        ));
     return tracks;
+  }
+  static getSongUrl(String id) async {
+    id = id.split("_")[1];
+    var data = {
+      "ids": [id],
+      "br": "999000"
+    };
+    var resp = await dio.post("http://music.163.com/weapi/song/enhance/player/url?csrf_token=",data: await weapi(convert.jsonEncode(data)));
+    print(resp.data);
   }
 
   // static Future<String> _aes_encrypt(String text, String sec_key, String algo) async {

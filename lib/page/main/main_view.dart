@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:unknown/page/play_list/play_list_index.dart';
+import 'package:unknown/page/player/player_index.dart';
 
 import 'main_logic.dart';
 
@@ -16,7 +17,7 @@ class MainPage extends GetView<MainLogic> {
         body: PageView(
           children: [
             PlayListPage(),
-            Center(child: Text("2"),),
+            PlayerPage(),
             Center(child: Text("3"),),
           ],
           physics: const NeverScrollableScrollPhysics(),

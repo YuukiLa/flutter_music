@@ -48,8 +48,8 @@ class SongListPage extends GetView<SongListLogic> {
                                 child: GestureDetector(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(Icons.collections_bookmark,size: 15,),
+                                    children: [
+                                      Icon(Icons.collections_bookmark,size: 15,color: Theme.of(context).primaryColor,),
                                       Text("收藏")
                                     ],
                                   ),
@@ -59,8 +59,8 @@ class SongListPage extends GetView<SongListLogic> {
                                   child: GestureDetector(
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.play_arrow,size: 15,),
+                                      children: [
+                                        Icon(Icons.play_arrow_sharp,size: 15,color: Theme.of(context).primaryColor,),
                                         Text("播放全部")
                                       ],
                                     ),
@@ -70,8 +70,8 @@ class SongListPage extends GetView<SongListLogic> {
                                   child: GestureDetector(
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.chair,size: 15,),
+                                      children: [
+                                        Icon(Icons.chair,size: 15,color: Theme.of(context).primaryColor,),
                                         Text("选择")
                                       ],
                                     ),
@@ -102,7 +102,7 @@ class SongListPage extends GetView<SongListLogic> {
         centerTitle: true,
         titleSpacing: 0,
         elevation: 0,
-        toolbarHeight: 90,
+        toolbarHeight: GetPlatform.isAndroid? 80:90,
         title: Obx(() {
           return Opacity(
             opacity: controller.state.appBarAlpha.value,
@@ -173,7 +173,7 @@ class SongListPage extends GetView<SongListLogic> {
                 placeholder: (context, url) =>
                     const CircularProgressIndicator(),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
-                imageUrl: controller.state.songs[index]["img_url"],
+                imageUrl: controller.state.songs[index].imgUrl,
               ),
             ),
             const SizedBox(
@@ -184,7 +184,7 @@ class SongListPage extends GetView<SongListLogic> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  controller.state.songs[index]["title"],
+                  controller.state.songs[index].title,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w300,
@@ -193,7 +193,7 @@ class SongListPage extends GetView<SongListLogic> {
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                   child: Text(
-                    controller.state.songs[index]["artist"],
+                    controller.state.songs[index].artist,
                     style: const TextStyle(
                       fontSize: 13,
                       color: Colors.black45,

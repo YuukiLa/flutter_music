@@ -44,6 +44,8 @@ dependencies:
   flutter_easyloading: ^3.0.3
   cached_network_image: ^3.2.0
   dartx: any
+  sembast: ^3.2.0
+  json_serializable: ^6.1.5
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +57,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
+  build_runner: ^2.1.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

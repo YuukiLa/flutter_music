@@ -38,6 +38,7 @@ class SongListLogic extends GetxController {
   }
 
   onSongClick(int index) {
+    Netease.getSongUrl(state.songs[index].id);
     print(index);
   }
 }
