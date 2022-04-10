@@ -67,6 +67,7 @@ class Netease extends AbstractProvider{
     return [];
   }
 
+  @override
   getPlaylist(String url) {
     print(url);
     var list_id = getUrlParams('list_id', url)?.split('_').first;
@@ -82,7 +83,7 @@ class Netease extends AbstractProvider{
     }
   }
 
-  static Future<Map<String, dynamic>> ne_get_playlist(String url) async {
+  Future<Map<String, dynamic>> ne_get_playlist(String url) async {
     var list_id = getUrlParams('list_id', url)?.split('_').last;
     const target_url = 'https://music.163.com/weapi/v3/playlist/detail';
     print(list_id);
@@ -297,11 +298,11 @@ class Netease extends AbstractProvider{
     return PlaylistFilter(recommend, all);
   }
 
-  static String? getUrlParams(String key, String url) {
-    if (url == "") {
-      return null;
-    }
-    var parse = Uri.parse(url);
-    return parse.queryParameters[key];
-  }
+  // static String? getUrlParams(String key, String url) {
+  //   if (url == "") {
+  //     return null;
+  //   }
+  //   var parse = Uri.parse(url);
+  //   return parse.queryParameters[key];
+  // }
 }

@@ -24,12 +24,12 @@ class PlayListLogic extends GetxController
 
   showPlaylist(bool isRefresh) async {
     var result = await MediaController.to.showPlaylistArray(
-        platforms[state.currTab.value], state.currPage.value * 35, "流行");
+        platforms[state.currTab.value], state.currPage[state.currTab.value] * 35, "");
     // print(result);
     if (isRefresh) {
-      state.playlist.clear();
+      state.playlist[state.currTab.value].clear();
     }
-    state.playlist.addAll(result!);
+    state.playlist[state.currTab.value].addAll(result!);
   }
 
   @override
@@ -48,10 +48,10 @@ class PlayListLogic extends GetxController
       Platform.QQ: RefreshController()
     };
     // refreshController = RefreshController();
-    state.filter.value = {
-      Platform.Netease: await MediaController.to.getFilter(Platform.Netease),
-      Platform.QQ: await MediaController.to.getFilter(Platform.QQ)
-    };
+    state.filter.addAll([
+      await MediaController.to.getFilter(Platform.Netease),
+      await MediaController.to.getFilter(Platform.QQ)
+    ]);
     await showPlaylist(true);
     EasyLoading.dismiss();
   }
@@ -62,22 +62,28 @@ class PlayListLogic extends GetxController
     // print(index);
     var playlist = state.playlist[index];
     Get.toNamed(AppRoutes.SONG_LIST,
-        arguments: {"id": state.playlist[index].id});
+        arguments: {"id": state.playlist[state.currTab.value][index].id});
   }
 
-  onTabChange() {
+  onTabChange() async{
     state.currTab.value = tabController.index;
+    if(state.playlist[tabController.index].isEmpty) {
+      EasyLoading.showProgress(0.3,
+          status: '加载中...', maskType: EasyLoadingMaskType.black);
+      await showPlaylist(true);
+      EasyLoading.dismiss();
+    }
   }
 
   Future<void> onRefresh() async {
-    state.currPage.value = 0;
+    state.currPage[state.currTab.value] = 0;
     await showPlaylist(true);
-    refreshController.refreshCompleted();
+    refreshControllerMap[platforms[state.currTab.value]]?.loadComplete();
   }
 
   Future<void> onLoading() async {
-    state.currPage.value++;
+    state.currPage[state.currTab.value]++;
     await showPlaylist(false);
-    refreshController.loadComplete();
+    refreshControllerMap[platforms[state.currTab.value]]?.loadComplete();
   }
 }

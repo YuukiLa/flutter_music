@@ -6,4 +6,12 @@ abstract class AbstractProvider {
   getPlaylist(String url);
   getSongUrl(String id);
   Future<PlaylistFilter> playlistFilter();
+
+  String? getUrlParams(String key, String url) {
+    if (url == "") {
+      return null;
+    }
+    var parse = Uri.parse(url);
+    return parse.queryParameters[key];
+  }
 }

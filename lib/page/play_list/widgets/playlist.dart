@@ -8,16 +8,18 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 
 class PlaylistWidget extends StatefulWidget {
   late String platform;
-  PlaylistWidget({Key? key,required this.platform}) : super(key: key);
+  late int index;
+  PlaylistWidget({Key? key,required this.platform,required this.index}) : super(key: key);
 
   @override
-  State<PlaylistWidget> createState() => _PlaylistWidgetState(platform);
+  State<PlaylistWidget> createState() => _PlaylistWidgetState(platform,index);
 }
 
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   final controller = Get.find<PlayListLogic>();
   late String platform;
-  _PlaylistWidgetState(this.platform);
+  late int index;
+  _PlaylistWidgetState(this.platform,this.index);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       child: ListView.separated(
                         itemBuilder: _buildTag,
                         scrollDirection: Axis.horizontal,
-                        itemCount: controller.state.filter[platform]?.recommend.length??0,
+                        itemCount: controller.state.filter.isEmpty? 0 :controller.state.filter[index].recommend.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const VerticalDivider(
                             width: 10,
@@ -57,7 +59,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 // }
                 SliverWaterfallFlow(
                   delegate: SliverChildBuilderDelegate(_buildItem,
-                      childCount: controller.state.playlist.length),
+                      childCount: controller.state.playlist[index].length),
                   gridDelegate:
                   const SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -71,17 +73,17 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       );
     });
   }
-  Widget _buildTag(BuildContext context, int index) {
+  Widget _buildTag(BuildContext context, int itemIndex) {
     return Obx(() {
       return ChoiceChip(
-        label: Text(controller.state.filter[platform]?.recommend[index].name??""),
-        selected: controller.state.currFilter.value==index,
-        onSelected: (bool value) { controller.state.currFilter.value=index; },);
+        label: Text(controller.state.filter[index].recommend[itemIndex].name),
+        selected: controller.state.currFilter[index]==itemIndex,
+        onSelected: (bool value) { controller.state.currFilter[index]=itemIndex; },);
     });
   }
-  Widget _buildItem(BuildContext context, int index) {
+  Widget _buildItem(BuildContext context, int itemIndex) {
     return GestureDetector(
-      onTap: ()=> controller.onPlaylistTap(index),
+      onTap: ()=> controller.onPlaylistTap(itemIndex),
         child: Container(
       padding: const EdgeInsets.all(5.0),
       child: Column(
@@ -94,7 +96,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusDirectional.circular(10)),
             clipBehavior: Clip.antiAlias,
-            child: Image.network(controller.state.playlist[index].coverImgUrl,
+            child: Image.network(controller.state.playlist[index][itemIndex].coverImgUrl,
                 fit: BoxFit.cover),
           ),
           Card(
@@ -103,7 +105,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             margin: const EdgeInsets.fromLTRB(10, 5, 5, 5),
             // clipBehavior: Clip.antiAlias,
             child: Text(
-              controller.state.playlist[index].title,
+              controller.state.playlist[index][itemIndex].title,
               style: const TextStyle(color: Colors.black38, fontSize: 12),
             ),
           )

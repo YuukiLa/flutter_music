@@ -17,8 +17,8 @@ class PlayListPage extends GetView<PlayListLogic> {
       ),
       body: TabBarView(
         children: [
-          PlaylistWidget(platform: Platform.Netease,),
-          PlaylistWidget(platform: Platform.QQ,),
+          PlaylistWidget(platform: Platform.Netease,index:0),
+          PlaylistWidget(platform: Platform.QQ,index:1),
         ],
         controller: controller.tabController,
 
