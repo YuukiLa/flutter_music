@@ -2,6 +2,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/service/media_service.dart';
+import 'package:unknown/common/utils/dialog.dart';
 
 import '../../common/provider/netease.dart';
 import 'song_list_state.dart';
@@ -9,15 +10,17 @@ import 'song_list_state.dart';
 class SongListLogic extends GetxController {
   final SongListState state = SongListState();
   late dynamic info;
+  late String platform;
+
 
   getSongList() async{
-    EasyLoading.showProgress(0.3, status: '加载中...',maskType: EasyLoadingMaskType.black);
-    var res = await MediaController.to.getPlaylistSongs(Platform.Netease,"/playlist?list_id=${state.id.value}");
+    Dialog.showLoading();
+    var res = await MediaController.to.getPlaylistSongs(platform,"/playlist?list_id=${state.id.value}");
     info = res["info"];
     state.title.value = info["title"];
     state.image.value = info["cover_img_url"];
     state.songs.addAll(res["tracks"]);
-    EasyLoading.dismiss();
+    Dialog.dismiss();
     print(res["tracks"]);
     print(state.songs.length);
   }
@@ -26,6 +29,7 @@ class SongListLogic extends GetxController {
   void onInit() {
     super.onInit();
     state.id.value = Get.arguments["id"];
+    platform = Get.arguments["platform"];
     getSongList();
   }
 
@@ -40,7 +44,7 @@ class SongListLogic extends GetxController {
   }
 
   onSongClick(int index) {
-    MediaController.to.getSongUrl(Platform.Netease,state.songs[index].id);
+    MediaController.to.getSongUrl(platform,state.songs[index].id);
     print(index);
   }
 }

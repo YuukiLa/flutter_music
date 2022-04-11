@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
+import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
@@ -58,7 +59,9 @@ class Netease extends AbstractProvider{
                     .attributes["title"] ??
                 "",
             "neplaylist_${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"] ?? "")}",
-            "https://music.163.com/#/playlist?id=${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"] ?? "")}"))
+            "https://music.163.com/#/playlist?id=${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"] ?? "")}",
+            Platform.Netease
+    ))
         .toList();
     return result;
   }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -96,7 +97,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusDirectional.circular(10)),
             clipBehavior: Clip.antiAlias,
-            child: Image.network(controller.state.playlist[index][itemIndex].coverImgUrl,
+            child: CachedNetworkImage(imageUrl:controller.state.playlist[index][itemIndex].coverImgUrl,
+                placeholder: (context, url) =>
+                const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
                 fit: BoxFit.cover),
           ),
           Card(

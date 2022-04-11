@@ -1,17 +1,12 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:unknown/common/enums/platform.dart';
-import 'package:unknown/common/model/playlist.dart';
-import 'package:unknown/common/provider/netease.dart';
 import 'package:unknown/common/route/app_routes.dart';
 import 'package:unknown/common/service/media_service.dart';
+import 'package:unknown/common/utils/dialog.dart' as Dialog;
 import 'package:unknown/page/play_list/play_list_index.dart';
-
-import '../../common/model/playlist_filter.dart';
 
 class PlayListLogic extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -34,8 +29,7 @@ class PlayListLogic extends GetxController
 
   @override
   Future<void> onInit() async {
-    EasyLoading.showProgress(0.3,
-        status: '加载中...', maskType: EasyLoadingMaskType.black);
+    Dialog.Dialog.showLoading();
     tabs = [
       const Tab(text: "网易云"),
       const Tab(text: "qq音乐"),
@@ -53,25 +47,24 @@ class PlayListLogic extends GetxController
       await MediaController.to.getFilter(Platform.QQ)
     ]);
     await showPlaylist(true);
-    EasyLoading.dismiss();
+    Dialog.Dialog.dismiss();
   }
 
   void onPlaylistTap(int index) {
     // Netease.weapi("text");
     // Netease.getPlaylist("/playlist?list_id=${state.playlist[index].id}");
     // print(index);
-    var playlist = state.playlist[index];
+    var playlist = state.playlist[state.currTab.value][index];
     Get.toNamed(AppRoutes.SONG_LIST,
-        arguments: {"id": state.playlist[state.currTab.value][index].id});
+        arguments: {"id": playlist.id,"platform":playlist.source});
   }
 
   onTabChange() async{
     state.currTab.value = tabController.index;
     if(state.playlist[tabController.index].isEmpty) {
-      EasyLoading.showProgress(0.3,
-          status: '加载中...', maskType: EasyLoadingMaskType.black);
+      Dialog.Dialog.showLoading();
       await showPlaylist(true);
-      EasyLoading.dismiss();
+      Dialog.Dialog.dismiss();
     }
   }
 

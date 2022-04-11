@@ -4,11 +4,14 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:html/dom.dart';
+import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
 import 'package:unknown/common/provider/abstract_provider.dart';
+
+import '../model/song.dart';
 
 class QQ extends AbstractProvider {
   static final dio = Dio(BaseOptions(headers: {
@@ -21,7 +24,86 @@ class QQ extends AbstractProvider {
 
   @override
   getPlaylist(String url) {
-    // TODO: implement getPlaylist
+    var list_id = getUrlParams('list_id', url)?.split('_');
+    switch (list_id![0]) {
+      case 'qqplaylist':
+        return qq_get_playlist(list_id[1]);
+      case 'qqalbum':
+      // return this.qq_album(url);
+      case 'qqartist':
+      // return this.qq_artist(url);
+      case 'qqtoplist':
+      // return this.qq_toplist(url);
+      default:
+        return null;
+    }
+  }
+
+  qq_get_playlist(String listId) async {
+    var target_url =
+        'https://i.y.qq.com/qzone-music/fcg-bin/fcg_ucc_getcdinfo_' +
+            'byids_cp.fcg?type=1&json=1&utf8=1&onlysong=0' +
+            "&nosign=1&disstid=$listId&g_tk=5381&loginUin=0&hostUin=0" +
+            '&format=json&inCharset=GB2312&outCharset=utf-8&notice=0' +
+            '&platform=yqq&needNewCode=0';
+    var resp = await dio.get(target_url);
+    var data = resp.data;
+    print(data);
+    var info = {
+      "cover_img_url": data["cdlist"][0]["logo"],
+      "title": data["cdlist"][0]["dissname"],
+      "id": "qqplaylist_$listId",
+      "source_url": "https://y.qq.com/n/ryqq/playlist/$listId"
+    };
+    var tracks = <Song>[];
+    data["cdlist"][0]["songlist"].forEach((item) => tracks.add(qq_convert_song(item)));
+    return {
+      "tracks": tracks, "info": info
+    };
+  }
+
+  Song qq_convert_song(dynamic song) {
+    var covert = Song(
+        "qqtrack_${song['songmid']}",
+        "${htmlParse(song['songname'])}",
+        "${htmlParse(song['singer'][0]['name'])}",
+        "qqartist_${song['singer'][0]['mid']}",
+        "${htmlParse(song['albumname'])}",
+        "qqalbum_${song['albummid']}",
+        "https://y.qq.com/#type=song&mid=${song['songmid']}&tpl=yqq_song_detail",
+        Platform.QQ,
+        qq_get_image_url(song["albummid"], 'album'),
+        qq_is_playable(song),
+        false);
+    return covert;
+  }
+
+  String qq_get_image_url(String qqimgid, String img_type) {
+    if (qqimgid == null) {
+      return '';
+    }
+    var category = '';
+    if (img_type == 'artist') {
+      category = 'T001R300x300M000';
+    }
+    if (img_type == 'album') {
+      category = 'T002R300x300M000';
+    }
+    var s = category + qqimgid;
+    var url = "https://y.gtimg.cn/music/photo_new/$s.jpg";
+    return url;
+  }
+
+  qq_is_playable(song) {
+    var switch_flag = song["switch"].toString(2).split('');
+    switch_flag.pop();
+    switch_flag.reverse();
+    // flag switch table meaning:
+    // ["play_lq", "play_hq", "play_sq", "down_lq", "down_hq", "down_sq", "soso",
+    //  "fav", "share", "bgm", "ring", "sing", "radio", "try", "give"]
+    var play_flag = switch_flag[0];
+    var try_flag = switch_flag[13];
+    return play_flag == '1' || (play_flag == '1' && try_flag == '1');
   }
 
   @override
@@ -80,7 +162,8 @@ class QQ extends AbstractProvider {
         item["imgurl"],
         htmlParse(item["dissname"]),
         "qqplaylist_${item['dissid']}",
-        "https://y.qq.com/n/ryqq/playlist/${item['dissid']}")));
+        "https://y.qq.com/n/ryqq/playlist/${item['dissid']}",
+        Platform.QQ)));
 
     return result;
   }
