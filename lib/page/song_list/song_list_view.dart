@@ -102,7 +102,7 @@ class SongListPage extends GetView<SongListLogic> {
         centerTitle: true,
         titleSpacing: 0,
         elevation: 0,
-        toolbarHeight: GetPlatform.isAndroid? 80:90,
+        toolbarHeight: GetPlatform.isAndroid? 55:90,
         title: Obx(() {
           return Opacity(
             opacity: controller.state.appBarAlpha.value,

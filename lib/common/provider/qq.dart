@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dartx/dartx.dart';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:html/dom.dart';
@@ -15,9 +16,9 @@ import '../model/song.dart';
 
 class QQ extends AbstractProvider {
   static final dio = Dio(BaseOptions(headers: {
-    "Referer": "https://y.qq.com",
-    "Origin": "https://y.qq.com",
-    "User-Agent":
+    "referer": "https://y.qq.com/",
+    "origin": "https://y.qq.com/",
+    "user-agent":
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
     "Content-Type": "application/x-www-form-urlencoded"
   }));
@@ -56,10 +57,9 @@ class QQ extends AbstractProvider {
       "source_url": "https://y.qq.com/n/ryqq/playlist/$listId"
     };
     var tracks = <Song>[];
-    data["cdlist"][0]["songlist"].forEach((item) => tracks.add(qq_convert_song(item)));
-    return {
-      "tracks": tracks, "info": info
-    };
+    data["cdlist"][0]["songlist"]
+        .forEach((item) => tracks.add(qq_convert_song(item)));
+    return {"tracks": tracks, "info": info};
   }
 
   Song qq_convert_song(dynamic song) {
@@ -73,8 +73,8 @@ class QQ extends AbstractProvider {
         "https://y.qq.com/#type=song&mid=${song['songmid']}&tpl=yqq_song_detail",
         Platform.QQ,
         qq_get_image_url(song["albummid"], 'album'),
-        qq_is_playable(song),
-        false);
+        "",
+        qq_is_playable(song));
     return covert;
   }
 
@@ -94,10 +94,10 @@ class QQ extends AbstractProvider {
     return url;
   }
 
-  qq_is_playable(song) {
-    var switch_flag = song["switch"].toString(2).split('');
-    switch_flag.pop();
-    switch_flag.reverse();
+  bool qq_is_playable(song) {
+    List<String> switch_flag = song["switch"].toRadixString(2).split('');
+    switch_flag.removeLast();
+    switch_flag = switch_flag.reversed.toList();
     // flag switch table meaning:
     // ["play_lq", "play_hq", "play_sq", "down_lq", "down_hq", "down_sq", "soso",
     //  "fav", "share", "bgm", "ring", "sing", "radio", "try", "give"]
@@ -107,8 +107,54 @@ class QQ extends AbstractProvider {
   }
 
   @override
-  getSongUrl(String id) {
-    // TODO: implement getSongUrl
+  getSongUrl(String id) async {
+    var songId = id.split("_")[1];
+    const target_url = 'https://u.y.qq.com/cgi-bin/musicu.fcg';
+    const guid = '10000';
+    var songmidList = [songId];
+    const uin = '0';
+    const fileType = '128';
+    var fileConfig = {
+      "m4a": {"s": "C400", "e": ".m4a", "bitrate": "M4A"},
+      '128': {"s": 'M500', "e": '.mp3', "bitrate": '128kbps'},
+      '320': {"s": 'M800', "e": '.mp3', "bitrate": '320kbps'},
+      "ape": {"s": 'A000', "e": '.ape', "bitrate": 'APE'},
+      "flac": {"s": 'F000', "e": '.flac', "bitrate": 'FLAC'}
+    };
+    var fileInfo = fileConfig[fileType];
+    // ignore: unnecessary_brace_in_string_interps
+    var file = songmidList.length == 1
+        ? ["${fileInfo!['s']}$songId${songId}${fileInfo['e']}"]
+        : [];
+    var reqData = {
+      "req_0": {
+        "module": 'vkey.GetVkeyServer',
+        "method": 'CgiGetVkey',
+        "param": {
+          "filename": file,
+          "guid": guid,
+          "songmid": songmidList,
+          "songtype": [0],
+          "uin": uin,
+          "loginflag": 1,
+          "platform": '20'
+        }
+      },
+      "loginUin": uin,
+      "comm": {"uin": uin, "format": 'json', "ct": 24, "cv": 0}
+    };
+    var params = {"format": 'json', "data": jsonEncode(reqData)};
+    // print(params["data"]);
+    var resp = await Dio(dio.options.copyWith(responseType: ResponseType.plain))
+        .get(target_url, queryParameters: params);
+    // print(resp.data);
+    var data = jsonDecode(resp.data);
+    var purl = data["req_0"]["data"]["midurlinfo"][0]["purl"];
+    if (purl == "") {
+      return "";
+    }
+    var url = data["req_0"]["data"]["sip"][0] + purl;
+    return url;
   }
 
   @override
@@ -171,6 +217,9 @@ class QQ extends AbstractProvider {
   qq_show_toplist(offset) {}
 
   htmlParse(String value) {
+    if (value == "") {
+      return "";
+    }
     var p = parse(value, encoding: "text/html");
     return p.body?.nodes[0].toString().replaceAll("\"", "") ?? "";
   }
