@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cc.yuuki.unknown">
    <application
+        android:usesCleartextTraffic="true"
         android:label="unknown"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -102,7 +102,7 @@ class SongListPage extends GetView<SongListLogic> {
         centerTitle: true,
         titleSpacing: 0,
         elevation: 0,
-        toolbarHeight: GetPlatform.isAndroid? 55:90,
+        toolbarHeight: GetPlatform.isAndroid? 90:90,
         title: Obx(() {
           return Opacity(
             opacity: controller.state.appBarAlpha.value,
@@ -187,6 +187,7 @@ class SongListPage extends GetView<SongListLogic> {
                   controller.state.songs[index].title,
                   style: const TextStyle(
                     fontSize: 15,
+                    overflow: TextOverflow.ellipsis,
                     fontWeight: FontWeight.w300,
                   ),
                 ),

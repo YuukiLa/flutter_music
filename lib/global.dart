@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/service/media_service.dart';
+import 'package:unknown/common/service/player_service.dart';
 import 'package:unknown/common/service/storage.dart';
 
 class Global {
@@ -9,6 +10,7 @@ class Global {
     WidgetsFlutterBinding.ensureInitialized();
     setSystemUi();
     await Get.putAsync<StorageService>(() => StorageService().init());
+    await Get.putAsync<PlayerService>(() => PlayerService().init());
     Get.put<MediaController>(MediaController());
   }
   static void setSystemUi() {

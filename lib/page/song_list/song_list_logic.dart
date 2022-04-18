@@ -43,8 +43,8 @@ class SongListLogic extends GetxController {
     state.appBarAlpha.value = alpha;
   }
 
-  onSongClick(int index) {
-    MediaController.to.getSongUrl(platform,state.songs[index].id);
+  onSongClick(int index) async {
+    await MediaController.to.play(state.songs[index]);
     print(index);
   }
 }

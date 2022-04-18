@@ -181,6 +181,8 @@ class Netease extends AbstractProvider{
     };
     var resp = await dio.post("http://music.163.com/weapi/song/enhance/player/url?csrf_token=",data: await weapi(convert.jsonEncode(data)));
     print(resp.data);
+    var resData = convert.jsonDecode(resp.data);
+    return resData["data"]?[0]?["url"] ?? "";
   }
 
   // static Future<String> _aes_encrypt(String text, String sec_key, String algo) async {

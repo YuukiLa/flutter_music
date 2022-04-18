@@ -46,6 +46,7 @@ dependencies:
   dartx: any
   sembast: ^3.2.0
   json_serializable: ^6.1.5
+  audioplayers: ^0.20.1
 
 dev_dependencies:
   flutter_test:
