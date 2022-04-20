@@ -1,18 +1,18 @@
 package cc.yuuki.unknown
 
-import io.flutter.embedding.android.FlutterActivity
-import android.os.Build.VERSION
 import android.os.Build
+import android.content.Context
+import android.os.Build.VERSION
 import android.os.Bundle
+import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
-import java.lang.Exception
-import java.lang.StringBuilder
 import java.math.BigInteger
 import java.util.*
 import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import com.ryanheise.audioservice.AudioServicePlugin
 
 class MainActivity: FlutterActivity() {
     //设置状态栏沉浸式透明（修改flutter状态栏黑色半透明为全透明）
@@ -21,6 +21,9 @@ class MainActivity: FlutterActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = 0
         }
+    }
+    override fun provideFlutterEngine(context: Context): FlutterEngine {
+        return AudioServicePlugin.getFlutterEngine(context)
     }
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

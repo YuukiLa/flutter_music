@@ -1,28 +1,34 @@
 
-import 'dart:io';
-
-import 'package:audioplayers/audioplayers.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/service/audio_player_handler.dart';
 
 import '../model/song.dart';
 
 class PlayerService extends GetxService {
   static PlayerService instance = Get.find();
-  static final AudioPlayer _audioPlayer = AudioPlayer();
-  static final AudioCache _audioCache = AudioCache();
-
+  late UnknownAudioPlayerHandler _audioHandler;
+  UnknownAudioPlayerHandler get audioHandler => _audioHandler;
 
   Future<PlayerService> init() async{
-    if (Platform.isIOS) {
-      _audioCache.fixedPlayer?.notificationService.startHeadlessService();
-    }
+    _audioHandler = await AudioService.init(
+      builder: ()=> UnknownAudioPlayerHandler(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'cc.yuuki.unknown',
+        androidNotificationChannelName: 'unknown music',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+        preloadArtwork: true,
+        androidShowNotificationBadge: true,
+      ),
+    );
     return this;
   }
 
+
   play(Song song) async {
-    var result = await _audioPlayer.play(song.url);
-    if(result!=1) {
-      print("play error");
-    }
+    print(song.url);
+    _audioHandler.playFromSong(song);
+    // _audioHandler.play();
   }
 }
