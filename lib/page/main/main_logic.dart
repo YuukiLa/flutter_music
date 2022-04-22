@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/route/app_routes.dart';
 
 import 'main_state.dart';
 
@@ -8,9 +9,8 @@ class MainLogic extends GetxController {
   late PageController pageController;
 
   void onPageChange(page) {
-    state.currPage=page;
+    state.currPage = page;
   }
-
 
   @override
   void onInit() {
@@ -21,17 +21,19 @@ class MainLogic extends GetxController {
   @override
   void onReady() {
     super.onReady();
-
   }
 
   @override
   void onClose() {
-    // TODO: implement onClose
     super.onClose();
   }
 
+  gotoSearch() {
+    Get.toNamed(AppRoutes.SEARCH);
+  }
+
   void onBottomTap(int value) {
-    state.currPage=value;
+    state.currPage = value;
     pageController.jumpToPage(value);
   }
 }

@@ -1,5 +1,5 @@
-
 import 'package:get/get.dart';
+import 'package:unknown/page/search/search_index.dart';
 import 'package:unknown/page/song_list/song_list_index.dart';
 
 import '../../page/main/main_index.dart';
@@ -10,14 +10,19 @@ class AppPages {
     return [
       GetPage(
           name: AppRoutes.INITIAL,
-          page: ()=> MainPage(),
-          binding: MainBinding()
-      ),
+          page: () => MainPage(),
+          binding: MainBinding(),
+          transition: Transition.rightToLeft),
       GetPage(
           name: AppRoutes.SONG_LIST,
-          page: ()=> SongListPage(),
-          binding: SongListBinding()
-      )
+          page: () => SongListPage(),
+          binding: SongListBinding(),
+          transition: Transition.rightToLeft),
+      GetPage(
+          name: AppRoutes.SEARCH,
+          page: () => SearchPage(),
+          binding: SearchBinding(),
+          transition: Transition.rightToLeft)
     ];
   }
 }
