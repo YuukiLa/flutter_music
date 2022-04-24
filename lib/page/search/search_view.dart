@@ -65,7 +65,7 @@ class SearchPage extends GetView<SearchLogic> {
                           ]),
                     )),
                     GestureDetector(
-                        onTap: controller.onCancel, child: const Text("取消"))
+                        onTap: controller.onCancel, child: Padding(padding: EdgeInsets.only(right: 10),child: const Text("取消"),))
                   ],
                 ),
               )
