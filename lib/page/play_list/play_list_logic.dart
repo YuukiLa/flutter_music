@@ -5,7 +5,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/route/app_routes.dart';
 import 'package:unknown/common/service/media_service.dart';
-import 'package:unknown/common/utils/dialog.dart' as Dialog;
+import 'package:unknown/common/utils/dialog.dart';
 import 'package:unknown/page/play_list/play_list_index.dart';
 
 class PlayListLogic extends GetxController
@@ -29,7 +29,7 @@ class PlayListLogic extends GetxController
 
   @override
   Future<void> onInit() async {
-    Dialog.Dialog.showLoading();
+    DialogUtil.showLoading();
     tabs = [
       const Tab(text: "网易云"),
       const Tab(text: "qq音乐"),
@@ -47,7 +47,7 @@ class PlayListLogic extends GetxController
       await MediaController.to.getFilter(Platform.QQ)
     ]);
     await showPlaylist(true);
-    Dialog.Dialog.dismiss();
+    DialogUtil.dismiss();
   }
 
   void onPlaylistTap(int index) {
@@ -62,9 +62,9 @@ class PlayListLogic extends GetxController
   onTabChange() async{
     state.currTab.value = tabController.index;
     if(state.playlist[tabController.index].isEmpty) {
-      Dialog.Dialog.showLoading();
+      DialogUtil.showLoading();
       await showPlaylist(true);
-      Dialog.Dialog.dismiss();
+      DialogUtil.dismiss();
     }
   }
 

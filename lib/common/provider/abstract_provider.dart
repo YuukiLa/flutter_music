@@ -1,5 +1,6 @@
 import '../model/playlist.dart';
 import '../model/playlist_filter.dart';
+import '../model/song.dart';
 
 abstract class AbstractProvider {
   Future<List<Playlist>?> showPlaylist(String url);
@@ -14,4 +15,6 @@ abstract class AbstractProvider {
     var parse = Uri.parse(url);
     return parse.queryParameters[key];
   }
+
+  Future<List<Song>> search(String keyword,int currPage);
 }

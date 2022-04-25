@@ -48,6 +48,7 @@ dependencies:
   json_serializable: ^6.1.5
   just_audio: ^0.9.20
   audio_service: ^0.18.4
+  dio_log : ^2.0.2
 
 dev_dependencies:
   flutter_test:

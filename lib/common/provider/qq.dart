@@ -223,4 +223,9 @@ class QQ extends AbstractProvider {
     var p = parse(value, encoding: "text/html");
     return p.body?.nodes[0].toString().replaceAll("\"", "") ?? "";
   }
+
+  @override
+  Future<List<Song>> search(String keyword, int currPage) async{
+    return [];
+  }
 }

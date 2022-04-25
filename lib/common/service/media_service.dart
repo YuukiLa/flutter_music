@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/model/playlist.dart';
@@ -35,7 +37,11 @@ class MediaController extends GetxController {
 
   }
 
-
+  Future<List<Song>?> searchSong(String source,int currPage,String keyword) async{
+    var result = await providers[source]?.search(keyword, currPage);
+    print(jsonEncode(result));
+    return result;
+  }
 
   Future<List<Playlist>?> showPlaylistArray(String source,int offset,String filterID) async{
     var url = "/show_playlist?${queryStringify({ "offset": offset.toString(), "filter_id": filterID })}";

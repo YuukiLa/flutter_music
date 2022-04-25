@@ -14,6 +14,7 @@ class SearchPage extends GetView<SearchLogic> {
       //   title: const Text("搜索"),
       //   elevation: 0,
       // ),
+      floatingActionButton: MaterialButton(onPressed: controller.showLog,child: Text("+"),),
       body: Column(
         children: [
           Container(
@@ -41,6 +42,7 @@ class SearchPage extends GetView<SearchLogic> {
                                 child: TextField(
                               controller: controller.textEditingController,
                               onChanged: controller.onTextChange,
+                              onSubmitted: controller.onSearch,
                               cursorColor: Theme.of(context).primaryColor,
                               autofocus: true,
                               // keyboardType: TextInputType.text,

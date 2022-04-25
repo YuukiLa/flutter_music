@@ -14,13 +14,13 @@ class SongListLogic extends GetxController {
 
 
   getSongList() async{
-    Dialog.showLoading();
+    DialogUtil.showLoading();
     var res = await MediaController.to.getPlaylistSongs(platform,"/playlist?list_id=${state.id.value}");
     info = res["info"];
     state.title.value = info["title"];
     state.image.value = info["cover_img_url"];
     state.songs.addAll(res["tracks"]);
-    Dialog.dismiss();
+    DialogUtil.dismiss();
     print(res["tracks"]);
     print(state.songs.length);
   }
