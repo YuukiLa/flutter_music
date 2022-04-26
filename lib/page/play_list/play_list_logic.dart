@@ -18,13 +18,20 @@ class PlayListLogic extends GetxController
   late final RefreshController refreshController;
 
   showPlaylist(bool isRefresh) async {
+    int currTab = state.currTab.value;
+    if (isRefresh) {
+      state.playlist[currTab].clear();
+      state.currPage[currTab] = 0;
+    }
+    DialogUtil.showLoading();
     var result = await MediaController.to.showPlaylistArray(
-        platforms[state.currTab.value], state.currPage[state.currTab.value] * 35, "");
+        platforms[currTab], state.currPage[currTab] * 35, state.filter[currTab].recommend[state.currFilter[currTab]].id);
     // print(result);
     if (isRefresh) {
-      state.playlist[state.currTab.value].clear();
+      state.playlist[currTab].clear();
     }
-    state.playlist[state.currTab.value].addAll(result!);
+    state.playlist[currTab].addAll(result!);
+    DialogUtil.dismiss();
   }
 
   @override
@@ -47,7 +54,7 @@ class PlayListLogic extends GetxController
       await MediaController.to.getFilter(Platform.QQ)
     ]);
     await showPlaylist(true);
-    DialogUtil.dismiss();
+
   }
 
   void onPlaylistTap(int index) {
@@ -62,9 +69,9 @@ class PlayListLogic extends GetxController
   onTabChange() async{
     state.currTab.value = tabController.index;
     if(state.playlist[tabController.index].isEmpty) {
-      DialogUtil.showLoading();
+
       await showPlaylist(true);
-      DialogUtil.dismiss();
+
     }
   }
 
@@ -78,5 +85,12 @@ class PlayListLogic extends GetxController
     state.currPage[state.currTab.value]++;
     await showPlaylist(false);
     refreshControllerMap[platforms[state.currTab.value]]?.loadComplete();
+  }
+
+  onTagChange(int itemIndex) {
+    state.currFilter[state.currTab.value]=itemIndex;
+    if(itemIndex!=1) {
+      showPlaylist(true);
+    }
   }
 }

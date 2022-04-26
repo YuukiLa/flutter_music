@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/model/playlist.dart';
+import 'package:unknown/common/model/playlist_filter.dart';
 import 'package:unknown/common/provider/abstract_provider.dart';
 import 'package:unknown/common/provider/netease.dart';
 import 'package:unknown/common/provider/qq.dart';
@@ -65,8 +66,8 @@ class MediaController extends GetxController {
     return song;
   }
 
-  getFilter(String source) async {
-    return await providers[source]?.playlistFilter();
+  Future<PlaylistFilter> getFilter(String source) async {
+    return await providers[source]!.playlistFilter();
   }
 
 

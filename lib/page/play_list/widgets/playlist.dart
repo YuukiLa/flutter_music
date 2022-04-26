@@ -79,7 +79,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       return ChoiceChip(
         label: Text(controller.state.filter[index].recommend[itemIndex].name),
         selected: controller.state.currFilter[index]==itemIndex,
-        onSelected: (bool value) { controller.state.currFilter[index]=itemIndex; },);
+        onSelected: (bool value) { controller.onTagChange(itemIndex); },);
     });
   }
   Widget _buildItem(BuildContext context, int itemIndex) {
