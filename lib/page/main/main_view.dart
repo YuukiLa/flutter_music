@@ -14,6 +14,7 @@ class MainPage extends GetView<MainLogic> {
       return Scaffold(
         appBar: AppBar(
           title: const Text("Unknown"),
+          centerTitle: true,
           actions: [
             IconButton(
                 onPressed: () => {controller.gotoSearch()},
@@ -21,10 +22,17 @@ class MainPage extends GetView<MainLogic> {
           ],
           elevation: 0,
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: Theme.of(context).primaryColor,
+          child: Icon(Icons.play_arrow, color: Colors.white),
+        ),
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.miniCenterDocked,
         body: PageView(
           children: [
             PlayListPage(),
-            PlayerPage(),
+            // PlayerPage(),
             Center(
               child: Text("3"),
             ),
@@ -36,11 +44,12 @@ class MainPage extends GetView<MainLogic> {
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-            BottomNavigationBarItem(icon: Icon(Icons.apple), label: ""),
+            // BottomNavigationBarItem(icon: Icon(Icons.apple), label: ""),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
           ],
           showSelectedLabels: false,
           showUnselectedLabels: false,
+          selectedItemColor: Theme.of(context).primaryColor,
           currentIndex: controller.state.currPage,
           onTap: controller.onBottomTap,
         ),

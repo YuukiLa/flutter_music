@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:unknown/common/widget/song_item.dart';
 import 'package:unknown/page/search/search_index.dart';
 
 class SearchPage extends GetView<SearchLogic> {
@@ -14,7 +16,6 @@ class SearchPage extends GetView<SearchLogic> {
       //   title: const Text("搜索"),
       //   elevation: 0,
       // ),
-      floatingActionButton: MaterialButton(onPressed: controller.showLog,child: Text("+"),),
       body: Column(
         children: [
           Container(
@@ -67,7 +68,11 @@ class SearchPage extends GetView<SearchLogic> {
                           ]),
                     )),
                     GestureDetector(
-                        onTap: controller.onCancel, child: Padding(padding: EdgeInsets.only(right: 10),child: const Text("取消"),))
+                        onTap: controller.onCancel,
+                        child: Padding(
+                          padding: EdgeInsets.only(right: 10),
+                          child: const Text("取消"),
+                        ))
                   ],
                 ),
               )
@@ -76,17 +81,54 @@ class SearchPage extends GetView<SearchLogic> {
           TabBar(
             isScrollable: true,
             tabs: controller.tabs,
+            indicatorColor: Theme.of(context).primaryColor,
             controller: controller.tabController,
           ),
           Expanded(
-              child: TabBarView(
-                  controller: controller.tabController,
-                  children: const [
-                Text("搜索"),
-                Text("搜索"),
-              ]))
+              child:
+                  TabBarView(controller: controller.tabController, children: [
+            Obx(() {
+              return SmartRefresher(
+                  controller: controller.refreshControllers[0],
+                  enablePullDown: false,
+                  enablePullUp: true,
+                  onLoading: controller.onLoad,
+                  child: ListView.separated(
+                      itemBuilder: ((context, index) {
+                        return _buildSongItem(context, index, 0);
+                      }),
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Container();
+                      },
+                      itemCount: controller.state.songs[0].length));
+            }),
+            Obx(() {
+              return SmartRefresher(
+                controller: controller.refreshControllers[1],
+                enablePullDown: false,
+                enablePullUp: true,
+                onLoading: controller.onLoad,
+                child: ListView.separated(
+                    itemBuilder: ((context, index) {
+                      return _buildSongItem(context, index, 1);
+                    }),
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Container();
+                    },
+                    itemCount: controller.state.songs[1].length),
+              );
+            })
+          ]))
         ],
       ),
     );
+  }
+
+  Widget _buildSongItem(BuildContext context, int index, int type) {
+    return InkWell(
+        onTap: () {},
+        child: SongItem(
+          song: controller.state.songs[type][index],
+        ));
   }
 }

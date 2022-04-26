@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/widget/song_item.dart';
 
 import 'song_list_logic.dart';
 
@@ -45,38 +46,47 @@ class SongListPage extends GetView<SongListLogic> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Expanded(
-                                child: GestureDetector(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.collections_bookmark,size: 15,color: Theme.of(context).primaryColor,),
-                                      Text("收藏")
-                                    ],
-                                  ),
-                                )
-                              ),
+                                  child: GestureDetector(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.collections_bookmark,
+                                      size: 15,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    Text("收藏")
+                                  ],
+                                ),
+                              )),
                               Expanded(
                                   child: GestureDetector(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.play_arrow_sharp,size: 15,color: Theme.of(context).primaryColor,),
-                                        Text("播放全部")
-                                      ],
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.play_arrow_sharp,
+                                      size: 15,
+                                      color: Theme.of(context).primaryColor,
                                     ),
-                                  )
-                              ),
+                                    Text("播放全部")
+                                  ],
+                                ),
+                              )),
                               Expanded(
                                   child: GestureDetector(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.chair,size: 15,color: Theme.of(context).primaryColor,),
-                                        Text("选择")
-                                      ],
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.chair,
+                                      size: 15,
+                                      color: Theme.of(context).primaryColor,
                                     ),
-                                  )
-                              ),
+                                    Text("选择")
+                                  ],
+                                ),
+                              )),
                             ],
                           ),
                         ),
@@ -102,7 +112,7 @@ class SongListPage extends GetView<SongListLogic> {
         centerTitle: true,
         titleSpacing: 0,
         elevation: 0,
-        toolbarHeight: GetPlatform.isAndroid? 90:90,
+        toolbarHeight: GetPlatform.isAndroid ? 90 : 90,
         title: Obx(() {
           return Opacity(
             opacity: controller.state.appBarAlpha.value,
@@ -156,56 +166,57 @@ class SongListPage extends GetView<SongListLogic> {
 
   Widget _buildSongItem(BuildContext context, int index) {
     return InkWell(
-      onTap: () => controller.onSongClick(index),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-        height: 70,
-        child: Row(
-          children: [
-            Card(
-              elevation: 0,
-              color: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.circular(8)),
-              clipBehavior: Clip.antiAlias,
-              child: CachedNetworkImage(
-                fit: BoxFit.cover,
-                placeholder: (context, url) =>
-                    const CircularProgressIndicator(),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-                imageUrl: controller.state.songs[index].imgUrl,
-              ),
-            ),
-            const SizedBox(
-              width: 7,
-            ),
-            Expanded(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  controller.state.songs[index].title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    overflow: TextOverflow.ellipsis,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                  child: Text(
-                    controller.state.songs[index].artist,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.black45,
-                    ),
-                  ),
-                ),
-              ],
-            ))
-          ],
-        ),
-      ),
-    );
+        onTap: () => controller.onSongClick(index),
+        child: SongItem(song: controller.state.songs[index])
+        // Container(
+        //   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+        //   height: 70,
+        //   child: Row(
+        //     children: [
+        //       Card(
+        //         elevation: 0,
+        //         color: Colors.transparent,
+        //         shape: RoundedRectangleBorder(
+        //             borderRadius: BorderRadiusDirectional.circular(8)),
+        //         clipBehavior: Clip.antiAlias,
+        //         child: CachedNetworkImage(
+        //           fit: BoxFit.cover,
+        //           placeholder: (context, url) =>
+        //               const CircularProgressIndicator(),
+        //           errorWidget: (context, url, error) => const Icon(Icons.error),
+        //           imageUrl: controller.state.songs[index].imgUrl,
+        //         ),
+        //       ),
+        //       const SizedBox(
+        //         width: 7,
+        //       ),
+        //       Expanded(
+        //           child: Column(
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           Text(
+        //             controller.state.songs[index].title,
+        //             style: const TextStyle(
+        //               fontSize: 15,
+        //               overflow: TextOverflow.ellipsis,
+        //               fontWeight: FontWeight.w300,
+        //             ),
+        //           ),
+        //           Container(
+        //             margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+        //             child: Text(
+        //               controller.state.songs[index].artist,
+        //               style: const TextStyle(
+        //                 fontSize: 13,
+        //                 color: Colors.black45,
+        //               ),
+        //             ),
+        //           ),
+        //         ],
+        //       ))
+        //     ],
+        //   ),
+        // ),
+        );
   }
 }

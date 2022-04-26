@@ -14,6 +14,7 @@ class Song {
   late String source;
   late String imgUrl;
   late String url;
+  late int time;
   late bool disabled;
 
   Song(
@@ -26,6 +27,7 @@ class Song {
       this.sourceUrl,
       this.source,
       this.imgUrl,
+      this.time,
       this.url,
       this.disabled);
 
@@ -39,6 +41,7 @@ class Song {
       required this.sourceUrl,
       required this.source,
       required this.imgUrl,
+      required this.time,
       required this.url,
       required this.disabled});
 
@@ -73,6 +76,7 @@ class Song {
         sourceUrl: map["sourceUrl"],
         source: map["source"],
         imgUrl: map["imgUrl"],
+        time: map["time"],
         url: map["url"],
         disabled: map["disabled"]);
   }

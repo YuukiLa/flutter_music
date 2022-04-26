@@ -12,16 +12,16 @@ class PlayListPage extends GetView<PlayListLogic> {
     return Scaffold(
       appBar: TabBar(
         isScrollable: true,
+        indicatorColor: Theme.of(context).primaryColor,
         tabs: controller.tabs,
         controller: controller.tabController,
       ),
       body: TabBarView(
         children: [
-          PlaylistWidget(platform: Platform.Netease,index:0),
-          PlaylistWidget(platform: Platform.QQ,index:1),
+          PlaylistWidget(platform: Platform.Netease, index: 0),
+          PlaylistWidget(platform: Platform.QQ, index: 1),
         ],
         controller: controller.tabController,
-
       ),
     );
   }

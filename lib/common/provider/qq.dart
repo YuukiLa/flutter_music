@@ -18,10 +18,37 @@ class QQ extends AbstractProvider {
   static final dio = Dio(BaseOptions(headers: {
     "referer": "https://y.qq.com/",
     "origin": "https://y.qq.com/",
+    "authority": "c.y.qq.com",
     "user-agent":
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
     "Content-Type": "application/x-www-form-urlencoded"
   }));
+  // ..interceptors.add(InterceptorsWrapper(
+  //     onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
+  //   print(
+  //       "\n================================= 请求数据 =================================");
+  //   print("method = ${options.method.toString()}");
+  //   print("url = ${options.uri.toString()}");
+  //   print("headers = ${options.headers}");
+  //   print("params = ${options.queryParameters}");
+  //   handler.next(options);
+  // }, onResponse: (Response response, ResponseInterceptorHandler handler) {
+  //   print(
+  //       "\n================================= 响应数据开始 =================================");
+  //   print("code = ${response.statusCode}");
+  //   print("data = ${response.data}");
+  //   print(
+  //       "================================= 响应数据结束 =================================\n");
+  //   handler.next(response);
+  // }, onError: (DioError e, ErrorInterceptorHandler handler) {
+  //   print(
+  //       "\n=================================错误响应数据 =================================");
+  //   print("type = ${e.type}");
+  //   print("message = ${e.message}");
+  //   print("stackTrace = ${e.stackTrace}");
+  //   print("\n");
+  //   handler.next(e);
+  // }));
 
   @override
   getPlaylist(String url) {
@@ -73,6 +100,7 @@ class QQ extends AbstractProvider {
         "https://y.qq.com/#type=song&mid=${song['songmid']}&tpl=yqq_song_detail",
         Platform.QQ,
         qq_get_image_url(song["albummid"], 'album'),
+        song["interval"] * 1000,
         "",
         qq_is_playable(song));
     return covert;
@@ -225,7 +253,37 @@ class QQ extends AbstractProvider {
   }
 
   @override
-  Future<List<Song>> search(String keyword, int currPage) async{
-    return [];
+  Future<List<Song>> search(String keyword, int currPage) async {
+    var target_url = "https://c.y.qq.com/soso/fcgi-bin/client_search_cp";
+    var params = {
+      "g_tk": 938407465,
+      "uin": 0,
+      "format": "json",
+      "inCharset": "utf-8",
+      "outCharset": "utf-8",
+      "notice": 0,
+      "platform": "h5",
+      "needNewCode": 1,
+      "w": keyword,
+      "zhidaqu": 1,
+      "catZhida": 1,
+      "t": 0,
+      "flag": 1,
+      "ie": "utf-8",
+      "sem": 1,
+      "aggr": 0,
+      "perpage": 20,
+      "n": 20,
+      "p": currPage,
+      "remoteplace": "txt.mqq.all",
+      "_": 1459991037831
+    };
+    var resp = await Dio().get(target_url, queryParameters: params);
+    var data = jsonDecode(resp.data);
+    var result = <Song>[];
+    data["data"]["song"]["list"].forEach((item) {
+      result.add(qq_convert_song(item));
+    });
+    return result;
   }
 }

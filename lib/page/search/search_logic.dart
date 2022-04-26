@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:unknown/common/utils/dialog.dart';
 import 'package:unknown/page/search/search_state.dart';
 
@@ -13,6 +14,7 @@ class SearchLogic extends GetxController
   late final List<Tab> tabs;
   late final TabController tabController;
   late final TextEditingController textEditingController;
+  late final List<RefreshController> refreshControllers;
 
   @override
   // ignore: must_call_super
@@ -24,22 +26,31 @@ class SearchLogic extends GetxController
     tabController = TabController(length: tabs.length, vsync: this)
       ..addListener(onTabChange);
     textEditingController = TextEditingController();
+    refreshControllers = [RefreshController(), RefreshController()];
   }
 
-  _searchSong(bool isRefresh) async{
+  _searchSong(bool isRefresh) async {
     DialogUtil.showLoading();
-    var result = await MediaController.to.searchSong(platforms[state.currTab.value], state.currPage[state.currTab.value], state.keyword.value);
+    var result = await MediaController.to.searchSong(
+        platforms[state.currTab.value],
+        state.currPage[state.currTab.value],
+        state.keyword.value);
     if (isRefresh) {
-      for (var element in state.songs) {element.clear();}
+      for (var element in state.songs) {
+        element.clear();
+      }
     }
     state.songs[state.currTab.value].addAll(result!);
     DialogUtil.dismiss();
   }
 
-  onTabChange() async{
+  onTabChange() {
     state.currTab.value = tabController.index;
-    if(state.songs[tabController.index].isEmpty) {
-      await _searchSong(false);
+    if (state.keyword.value == "") {
+      return;
+    }
+    if (state.songs[tabController.index].isEmpty) {
+      _searchSong(false);
     }
   }
 
@@ -57,13 +68,16 @@ class SearchLogic extends GetxController
   }
 
   onSearch(String value) {
-    if(value=="") {
+    if (value == "") {
       DialogUtil.toast("请输入要搜索的歌曲");
       return;
     }
     _searchSong(true);
   }
-  showLog() {
 
+  onLoad() async {
+    state.currPage[state.currTab.value]++;
+    await _searchSong(false);
+    refreshControllers[state.currTab.value].loadComplete();
   }
 }

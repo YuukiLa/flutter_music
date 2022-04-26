@@ -46,12 +46,13 @@ class MyApp extends StatelessWidget {
           // },
           getPages: AppPages.pages(),
           initialRoute: AppRoutes.INITIAL,
-          theme:
-              ThemeData(
-                  primaryColor: Colors.amberAccent,
-                appBarTheme: AppBarTheme(color: Colors.amberAccent),
-                chipTheme: ChipThemeData(selectedColor: Colors.amberAccent,shadowColor: Colors.transparent,selectedShadowColor: Colors.transparent)
-              ),
+          theme: ThemeData(
+              primaryColor: Colors.amberAccent,
+              appBarTheme: AppBarTheme(color: Colors.amberAccent),
+              chipTheme: ChipThemeData(
+                  selectedColor: Colors.amberAccent,
+                  shadowColor: Colors.transparent,
+                  selectedShadowColor: Colors.transparent)),
           themeMode: ThemeMode.system,
           builder: EasyLoading.init(),
         ));

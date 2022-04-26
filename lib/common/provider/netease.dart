@@ -16,7 +16,7 @@ import 'package:unknown/common/provider/abstract_provider.dart';
 
 import '../model/song.dart';
 
-class Netease extends AbstractProvider{
+class Netease extends AbstractProvider {
   static const channel = MethodChannel('unknown/neteaseEnc');
   static final dio = Dio(BaseOptions(headers: {
     "Referer": "https://music.163.com",
@@ -25,35 +25,34 @@ class Netease extends AbstractProvider{
     "User-Agent":
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
     "Content-Type": "application/x-www-form-urlencoded",
-    "cookie":"NMTID=00OV7gTWb1-5yFN3kAujDgyS5pvnkEAAAGAYSrsGQ",
+    "cookie": "NMTID=00OV7gTWb1-5yFN3kAujDgyS5pvnkEAAAGAYSrsGQ",
     // "cookie": "_iuqxldmzr_=32; _ntes_nuid=a82ed4abdad948ae4ecdba71bf4ba8a8; WM_TID=GkalpOJKWpFAQVRFAEdvEuu2zrQKC3uj; _ntes_nnid=a82ed4abdad948ae4ecdba71bf4ba8a8,1622347505950; NMTID=00O-xs9VfjspuHjMEIBoCUi6aeNrl4AAAF6V_oUvA; WEVNSM=1.0.0; WNMCID=qvblxb.1624973645128.01.0; _ns=NS1.2.1778974413.1641207971; JSESSIONID-WYYY=WmQhiZ4Y%5CfwtD%5CkSBWBvKEHMn%2FcIf1Es4pq4ilt66%5CsVN86uJvomaCBtBv4e9nIIJZylT%2FVYKOM6K2rEtAOlDdnKzey9Yx4MggjqCTBauewfSDt8us3JDX2dNqQNwnPjgqT46FVmvwx6%5CxzFuxqjF04vuu%5ChE7ibZBFsHxHQZQW%5CNdpI%3A1643693262143; WM_NI=ylzrpufQYoFhs6M4o3XQWKTWuLGnpzpD2yfX6%2FQ%2BIAGyGLO71iqHoMSnLIUbDAog%2FHe1eDKbEHNNyof2ZyDskFaOmirN1W31JLQhIPXQ%2FnC474eOoEiYPYr9Z0ARQ%2FQZT2E%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6ee96e57eb3eff8a3ce44a8968aa7c14f868f8abbaa7a8fb0af8bd670acb1fb90c12af0fea7c3b92abbb4b693f37fa68f9790c564b1ea83d5ee399c8f99acd75db794898ff372b49cfe9ae554f6f19fcccc4b85a789adce3df3b7bfa9ee4791b284aad86a889fa188ae44a7efaba5ca6a879882affc65a6ee969ac779a99aafb0f063b292ffb8b23b8a949f89cc5c9c8fe18fc240f5ecabb0ee4fab87a0baf1339af08fb3d42593869cd3c837e2a3"
-  }))
-  ..interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options,RequestInterceptorHandler handler) {
-    print(
-        "\n================================= 请求数据 =================================");
-    print("method = ${options.method.toString()}");
-    print("url = ${options.uri.toString()}");
-    print("headers = ${options.headers}");
-    print("params = ${options.queryParameters}");
-    handler.next(options);
-  },onResponse: (Response response,ResponseInterceptorHandler handler) {
-    print(
-        "\n================================= 响应数据开始 =================================");
-    print("code = ${response.statusCode}");
-    print("data = ${response.data}");
-    print(
-        "================================= 响应数据结束 =================================\n");
-    handler.next(response);
-  }, onError: (DioError e,ErrorInterceptorHandler handler) {
-    print(
-        "\n=================================错误响应数据 =================================");
-    print("type = ${e.type}");
-    print("message = ${e.message}");
-    print("stackTrace = ${e.stackTrace}");
-    print("\n");
-    handler.next(e);
   }));
-
+  // ..interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options,RequestInterceptorHandler handler) {
+  //   print(
+  //       "\n================================= 请求数据 =================================");
+  //   print("method = ${options.method.toString()}");
+  //   print("url = ${options.uri.toString()}");
+  //   print("headers = ${options.headers}");
+  //   print("params = ${options.queryParameters}");
+  //   handler.next(options);
+  // },onResponse: (Response response,ResponseInterceptorHandler handler) {
+  //   print(
+  //       "\n================================= 响应数据开始 =================================");
+  //   print("code = ${response.statusCode}");
+  //   print("data = ${response.data}");
+  //   print(
+  //       "================================= 响应数据结束 =================================\n");
+  //   handler.next(response);
+  // }, onError: (DioError e,ErrorInterceptorHandler handler) {
+  //   print(
+  //       "\n=================================错误响应数据 =================================");
+  //   print("type = ${e.type}");
+  //   print("message = ${e.message}");
+  //   print("stackTrace = ${e.stackTrace}");
+  //   print("\n");
+  //   handler.next(e);
+  // }));
 
   Future<List<Playlist>?> showPlaylist(String url) async {
     const order = 'hot';
@@ -90,8 +89,7 @@ class Netease extends AbstractProvider{
                 "",
             "neplaylist_${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"] ?? "")}",
             "https://music.163.com/#/playlist?id=${getUrlParams('id', item.getElementsByTagName('div')[0].getElementsByTagName('a')[0].attributes["href"] ?? "")}",
-            Platform.Netease
-    ))
+            Platform.Netease))
         .toList();
     return result;
   }
@@ -175,7 +173,7 @@ class Netease extends AbstractProvider{
     return result;
   }
 
-  static ng_parse_playlist_tracks(List<dynamic> playlist_tracks) async {
+  ng_parse_playlist_tracks(List<dynamic> playlist_tracks) async {
     const target_url = 'https://music.163.com/weapi/v3/song/detail';
     var track_ids = playlist_tracks.map((i) => i["id"]);
     var d = {
@@ -186,30 +184,31 @@ class Netease extends AbstractProvider{
     var response = await dio.post(target_url, data: data);
     var res = convert.jsonDecode(response.data);
     var songs = res["songs"] as List<dynamic>;
-    print(res);
-    print(songs.length);
     var tracks = songs.map((track_json) => Song(
-          "netrack_${track_json["id"]}",
-          track_json["name"],
-          track_json["ar"][0]["name"],
-          "neartist_${track_json["ar"][0]["id"]}",
-          track_json["al"]["name"],
-          "nealbum_${track_json["al"]["id"]}",
-          "https://music.163.com/#/song?id=${track_json["id"]}",
-          'netease',
-          track_json["al"]["picUrl"],
-          "",
-          false,
-        ));
+        "netrack_${track_json["id"]}",
+        track_json["name"],
+        track_json["ar"][0]["name"],
+        "neartist_${track_json["ar"][0]["id"]}",
+        track_json["al"]["name"],
+        "nealbum_${track_json["al"]["id"]}",
+        "https://music.163.com/#/song?id=${track_json["id"]}",
+        'netease',
+        track_json["al"]["picUrl"],
+        track_json["dt"],
+        "",
+        !is_playable(track_json)));
     return tracks;
   }
+
   getSongUrl(String id) async {
     id = id.split("_")[1];
     var data = {
       "ids": [id],
       "br": "999000"
     };
-    var resp = await dio.post("http://music.163.com/weapi/song/enhance/player/url?csrf_token=",data: await weapi(convert.jsonEncode(data)));
+    var resp = await dio.post(
+        "http://music.163.com/weapi/song/enhance/player/url?csrf_token=",
+        data: await weapi(convert.jsonEncode(data)));
     print(resp.data);
     var resData = convert.jsonDecode(resp.data);
     return resData["data"]?[0]?["url"] ?? "";
@@ -236,7 +235,7 @@ class Netease extends AbstractProvider{
     return randomString;
   }
 
-  Future<PlaylistFilter>  playlistFilter() async{
+  Future<PlaylistFilter> playlistFilter() async {
     var recommend = [
       Filter("", "全部"),
       Filter("toplist", "排行榜"),
@@ -334,7 +333,7 @@ class Netease extends AbstractProvider{
   }
 
   @override
-  Future<List<Song>> search(String keyword, int currPage) async{
+  Future<List<Song>> search(String keyword, int currPage) async {
     const target_url = 'https://music.163.com/api/search/pc';
     var req_data = {
       "s": keyword,
@@ -342,15 +341,25 @@ class Netease extends AbstractProvider{
       "limit": 20,
       "type": "1"
     };
-    var resp = await dio.post(target_url,data: req_data);
+    var resp = await dio.post(target_url, data: req_data);
     var data = convert.jsonDecode(resp.data);
     print(data.toString());
 
     var result = <Song>[];
     data["result"]["songs"].forEach((song_info) {
-       result.add(Song("netrack_${song_info['id']}", song_info["name"], song_info["artists"][0]["name"],
-          "neartist_${song_info['artists'][0]['id']}", song_info["album"]["name"], "nealbum_${song_info['album']['id']}", "https://music.163.com/#/song?id=${song_info['id']}",
-          "netease", song_info["album"]["picUrl"], "", !is_playable(song_info)));
+      result.add(Song(
+          "netrack_${song_info['id']}",
+          song_info["name"],
+          song_info["artists"][0]["name"],
+          "neartist_${song_info['artists'][0]['id']}",
+          song_info["album"]["name"],
+          "nealbum_${song_info['album']['id']}",
+          "https://music.163.com/#/song?id=${song_info['id']}",
+          "netease",
+          song_info["album"]["picUrl"],
+          song_info["duration"],
+          "",
+          !is_playable(song_info)));
     });
     return result;
   }
