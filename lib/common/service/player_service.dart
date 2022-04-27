@@ -26,7 +26,8 @@ class PlayerService extends GetxService {
 
   play(Song song) async {
     print(song.url);
-    _audioHandler.playFromSong(song);
+    await _audioHandler.addSong(song);
+    _audioHandler.playIndex(_audioHandler.songsLen-1);
     // _audioHandler.play();
   }
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:unknown/common/service/player_service.dart';
 import 'package:unknown/common/utils/dialog.dart';
 import 'package:unknown/page/search/search_state.dart';
 
 import '../../common/enums/platform.dart';
+import '../../common/model/song.dart';
 import '../../common/service/media_service.dart';
 
 class SearchLogic extends GetxController
@@ -60,6 +62,10 @@ class SearchLogic extends GetxController
 
   onCancel() {
     Get.back();
+  }
+
+  playSong(Song song) {
+    PlayerService.instance.play(song);
   }
 
   onClear() {

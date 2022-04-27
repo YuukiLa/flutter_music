@@ -53,15 +53,17 @@ class MediaController extends GetxController {
     return await providers[source]?.getPlaylist(url);
   }
 
-  Future<Song> getSongUrl(Song song) async{
-    Song? dbSong = await StorageService.to.getSongById(song.id);
-    if(dbSong!=null) {
-      print("dbsong");
-      return dbSong;
+  Future<Song> getSongUrl(Song song,{bool fromDb=false}) async{
+    if(fromDb) {
+      Song? dbSong = await StorageService.to.getSongById(song.id);
+      if(dbSong!=null) {
+        print("dbsong");
+        return dbSong;
+      }
     }
     var url = await providers[song.source]?.getSongUrl(song.id);
     song.url = url;
-    StorageService.to.saveSong(song);
+    // StorageService.to.saveSong(song);
     print("new song");
     return song;
   }

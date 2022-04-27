@@ -126,7 +126,9 @@ class SearchPage extends GetView<SearchLogic> {
 
   Widget _buildSongItem(BuildContext context, int index, int type) {
     return InkWell(
-        onTap: () {},
+        onTap: () {
+          controller.playSong(controller.state.songs[type][index]);
+        },
         child: SongItem(
           song: controller.state.songs[type][index],
         ));

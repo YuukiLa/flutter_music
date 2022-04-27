@@ -6,6 +6,7 @@ import '../model/song.dart';
 
 abstract class AudioPlayerHandler implements AudioHandler {
   // 添加公共方法
+  Future<void> addSong(Song song);
   Future<void> changeQueueLists(List<Song> songs, {int index = 0});
   Future<void> readySongUrl();
   Future<void> playIndex(int index);
@@ -13,6 +14,7 @@ abstract class AudioPlayerHandler implements AudioHandler {
 
 class UnknownAudioPlayerHandler extends BaseAudioHandler
     with SeekHandler implements AudioPlayerHandler{
+  final _emptySong = Song("", "无播放源", "", "", "", "", "", "", "images/common/bet.png", 0, "", true);
   final _player = AudioPlayer();
   final _songlist = <Song>[];
   int _curIndex=0;
@@ -20,7 +22,9 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
   }
 
-  Song get currPlaying => _songlist[_curIndex];
+  Song get currPlaying=> _songlist.isNotEmpty ? _songlist[_curIndex] : _emptySong;
+
+  int get songsLen=> _songlist.length;
 
 
   playFromSong(Song song) async {
@@ -192,6 +196,21 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
       speed: _player.speed,
       queueIndex: event.currentIndex,
     );
+  }
+
+  @override
+  Future<void> addSong(Song song) async {
+    if (_songlist.length > 0) {
+      // 判断当前歌曲的位置是否是处于最后一位
+      _songlist.insert(_curIndex + 1, song);
+      final newQueue = queue.value..insert(_curIndex + 1, _song2MediaItem(song));
+      _curIndex++;
+      queue.add(newQueue);
+    } else {
+      _songlist.insert(_curIndex, song);
+      final newQueue = queue.value..insert(_curIndex, _song2MediaItem(song));
+      queue.add(newQueue);
+    }
   }
 
 
