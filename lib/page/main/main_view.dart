@@ -23,12 +23,13 @@ class MainPage extends GetView<MainLogic> {
           elevation: 0,
         ),
         floatingActionButton: GestureDetector(
-
+          onTap: controller.gotoPlayer,
           onHorizontalDragStart: controller.onHorizontalDragStart,
           onHorizontalDragUpdate: controller.onHorizontalDragUpdate,
           onHorizontalDragEnd: controller.onHorizontalDragEnd,
           child: ClipOval(
-            child: Image.network("https://i2.hdslb.com/bfs/archive/8173bcb88156b8d5cea824a866bd276bb32a01d8.jpg@672w_378h_1c.webp",
+            child: Image.network(
+              "https://i2.hdslb.com/bfs/archive/8173bcb88156b8d5cea824a866bd276bb32a01d8.jpg@672w_378h_1c.webp",
               width: 65,
               height: 65,
               fit: BoxFit.cover,

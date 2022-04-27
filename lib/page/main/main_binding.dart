@@ -9,6 +9,5 @@ class MainBinding extends Bindings {
   void dependencies() {
     Get.lazyPut(() => MainLogic());
     Get.lazyPut(() => PlayListLogic());
-    Get.lazyPut(() => PlayerLogic());
   }
 }

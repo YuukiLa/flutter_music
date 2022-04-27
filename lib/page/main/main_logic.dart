@@ -21,27 +21,23 @@ class MainLogic extends GetxController {
     pageController = PageController(initialPage: state.currPage);
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   onHorizontalDragStart(DragStartDetails details) {
     _initialSwipeOffset = details.globalPosition;
   }
+
   onHorizontalDragUpdate(DragUpdateDetails details) {
     _finalSwipeOffset = details.globalPosition;
   }
+
   onHorizontalDragEnd(DragEndDetails details) {
     if (_initialSwipeOffset != null) {
       final offsetDifference = _initialSwipeOffset.dx - _finalSwipeOffset.dx;
       final direction = offsetDifference > 0 ? print('left') : print('right');
     }
+  }
+
+  gotoPlayer() {
+    Get.toNamed(AppRoutes.PLAYER);
   }
 
   gotoSearch() {
