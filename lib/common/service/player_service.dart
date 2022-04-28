@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/service/audio_player_handler.dart';
@@ -27,7 +29,18 @@ class PlayerService extends GetxService {
   play(Song song) async {
     print(song.url);
     await _audioHandler.addSong(song);
-    _audioHandler.playIndex(_audioHandler.songsLen-1);
+    _audioHandler.playIndex(_audioHandler.songsLen - 1);
     // _audioHandler.play();
+  }
+
+  StreamSubscription<Duration> addPlayingListener(Function call) {
+    var listen = AudioService.position.listen((position) {
+      call(position);
+    });
+    return listen;
+  }
+
+  removePlayingListener(StreamSubscription<Duration> listen) {
+    listen.cancel();
   }
 }
