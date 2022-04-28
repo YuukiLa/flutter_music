@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/widget/image_menu.dart';
+import 'package:unknown/common/widget/song_progress.dart';
 
 import 'player_logic.dart';
 
@@ -84,13 +86,14 @@ class PlayerPage extends GetView<PlayerLogic> {
                                         children: [
                                           Align(
                                             alignment: Alignment.center,
-                                            child:
-                                            controller.state.showplanet.value
+                                            child: controller
+                                                    .state.showplanet.value
                                                 ? SizedBox()
                                                 : SizedBox(),
                                           ),
                                           RotationTransition(
-                                            turns: controller.animationController,
+                                            turns:
+                                                controller.animationController,
                                             child: Stack(
                                               children: [
                                                 Image.asset(
@@ -106,23 +109,23 @@ class PlayerPage extends GetView<PlayerLogic> {
                                                       tag: "playing",
                                                       child: ClipRRect(
                                                         borderRadius:
-                                                        BorderRadius.circular(
-                                                            260),
+                                                            BorderRadius
+                                                                .circular(260),
                                                         child: controller
-                                                            .state
-                                                            .currsong
-                                                            .id
-                                                            .isEmpty
-                                                            ? SizedBox()
-                                                            : Image.network(
-                                                            controller
                                                                 .state
                                                                 .currsong
-                                                                .imgUrl,
-                                                            width: 180,
-                                                            height: 180,
-                                                            fit:
-                                                            BoxFit.cover),
+                                                                .id
+                                                                .isEmpty
+                                                            ? SizedBox()
+                                                            : Image.network(
+                                                                controller
+                                                                    .state
+                                                                    .currsong
+                                                                    .imgUrl,
+                                                                width: 180,
+                                                                height: 180,
+                                                                fit: BoxFit
+                                                                    .cover),
                                                       ),
                                                     ))
                                               ],
@@ -143,24 +146,38 @@ class PlayerPage extends GetView<PlayerLogic> {
                       ),
                       // flex: 1,
                     ),
-                    // Padding(
-                    //   padding: EdgeInsets.only(
-                    //       top: 0, left: 15, right: 15, bottom: 15),
-                    //   child: SongProgressWidget(model),
-                    // ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 0, left: 15, right: 15, bottom: 15),
+                      child: SongProgressWidget(),
+                    ),
                     // PlayBottomMenuWidget(model),
-                    SizedBox(
+                    _buildController(context),
+                    const SizedBox(
                       height: 10,
                     ),
                   ],
                 )
-              // height: 400,
-              // color: Colors.black,
-            );
+                // height: 400,
+                // color: Colors.black,
+                );
           })
-
         ],
       ),
     );
+  }
+
+  Widget _buildController(BuildContext context) {
+    return Obx(() {
+      return Row(
+        children: [
+          ImageMenuWidget(
+            'images/common/icon_song_play_type_1.png',
+            40.0,
+            onTap: () {},
+          )
+        ],
+      );
+    });
   }
 }
