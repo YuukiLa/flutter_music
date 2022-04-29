@@ -13,22 +13,25 @@ abstract class AudioPlayerHandler implements AudioHandler {
 }
 
 class UnknownAudioPlayerHandler extends BaseAudioHandler
-    with SeekHandler implements AudioPlayerHandler{
-  final _emptySong = Song("", "无播放源", "", "", "", "", "", "", "images/common/bet.png", 0, "", true);
+    with SeekHandler
+    implements AudioPlayerHandler {
+  final _emptySong = Song(
+      "", "无播放源", "", "", "", "", "", "", "images/common/bet.png", 0, "", true);
   final _player = AudioPlayer();
   final _songlist = <Song>[];
-  int _curIndex=0;
+  int _curIndex = 0;
   UnknownAudioPlayerHandler() {
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
   }
 
-  Song get currPlaying=> _songlist.isNotEmpty ? _songlist[_curIndex] : _emptySong;
-
-  int get songsLen=> _songlist.length;
-
+  Song get currPlaying =>
+      _songlist.isNotEmpty ? _songlist[_curIndex] : _emptySong;
+  int get songsLen => _songlist.length;
+  List<Song> get songList => _songlist;
+  bool get isPlaying => _player.playing;
 
   playFromSong(Song song) async {
-    if(song.url=="") {
+    if (song.url == "") {
       song = await MediaController.to.getSongUrl(song);
     }
     var item = _song2MediaItem(song);
@@ -37,8 +40,6 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
     mediaItem.add(item);
     play();
   }
-
-
 
   @override
   Future<void> changeQueueLists(List<Song> songs, {int index = 0}) async {
@@ -54,15 +55,15 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
   }
 
   @override
-  Future<void> playIndex(int index) async{
+  Future<void> playIndex(int index) async {
     _curIndex = index;
     readySongUrl();
   }
 
   @override
-  Future<void> readySongUrl() async{
+  Future<void> readySongUrl() async {
     var song = this._songlist[_curIndex];
-    if(song.url=="") {
+    if (song.url == "") {
       song = await MediaController.to.getSongUrl(song);
     }
     var item = _song2MediaItem(song);
@@ -87,6 +88,7 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
     readySongUrl();
     print('触发播放下一首');
   }
+
   @override
   Future<void> skipToPrevious() async {
     if (_curIndex <= 0) {
@@ -104,7 +106,7 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
   }
 
   @override
-  Future<void> removeQueueItemAt(int index) async{
+  Future<void> removeQueueItemAt(int index) async {
     _songlist.removeAt(index);
 
     // notify system
@@ -113,7 +115,7 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
   }
 
   @override
-  Future<void> addQueueItem(MediaItem mediaItem) async{
+  Future<void> addQueueItem(MediaItem mediaItem) async {
     // manage Just Audio
     if (_songlist.length > 0) {
       // 判断当前歌曲的位置是否是处于最后一位
@@ -126,7 +128,6 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
       final newQueue = queue.value..insert(_curIndex, mediaItem);
       queue.add(newQueue);
     }
-
   }
 
   @override
@@ -146,29 +147,37 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
 
   MediaItem _song2MediaItem(Song song) {
     return MediaItem(
-      id: song.id,
-      title: song.title,
-      artist: song.artist,
-      album: song.album,
-      duration: Duration(milliseconds: song.time),
-      artUri: Uri.parse(song.imgUrl),
-      extras: {
-        "artistId": song.artistId,
-        "sourceUrl": song.sourceUrl,
-        "albumId": song.albumId,
-        "source": song.source,
-        "url":song.url,
-        "disabled":song.disabled
-      }
-    );
+        id: song.id,
+        title: song.title,
+        artist: song.artist,
+        album: song.album,
+        duration: Duration(milliseconds: song.time),
+        artUri: Uri.parse(song.imgUrl),
+        extras: {
+          "artistId": song.artistId,
+          "sourceUrl": song.sourceUrl,
+          "albumId": song.albumId,
+          "source": song.source,
+          "url": song.url,
+          "disabled": song.disabled
+        });
   }
 
   Song _mediaItem2Song(MediaItem item) {
-    return Song(item.id, item.title, item.artist!, item.extras!["artistId"],
-        item.album!,item.extras!["albumId"], item.extras!["sourceUrl"], item.extras!["source"],
-        item.artUri.toString(), item.duration!.inMilliseconds, item.extras!["url"], item.extras!["disabled"]);
+    return Song(
+        item.id,
+        item.title,
+        item.artist!,
+        item.extras!["artistId"],
+        item.album!,
+        item.extras!["albumId"],
+        item.extras!["sourceUrl"],
+        item.extras!["source"],
+        item.artUri.toString(),
+        item.duration!.inMilliseconds,
+        item.extras!["url"],
+        item.extras!["disabled"]);
   }
-
 
   PlaybackState _transformEvent(PlaybackEvent event) {
     return PlaybackState(
@@ -203,7 +212,8 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
     if (_songlist.length > 0) {
       // 判断当前歌曲的位置是否是处于最后一位
       _songlist.insert(_curIndex + 1, song);
-      final newQueue = queue.value..insert(_curIndex + 1, _song2MediaItem(song));
+      final newQueue = queue.value
+        ..insert(_curIndex + 1, _song2MediaItem(song));
       _curIndex++;
       queue.add(newQueue);
     } else {
@@ -212,6 +222,4 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
       queue.add(newQueue);
     }
   }
-
-
 }

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/utils/dialog.dart';
 import 'package:unknown/common/widget/image_menu.dart';
 import 'package:unknown/common/widget/song_progress.dart';
 
@@ -146,6 +147,7 @@ class PlayerPage extends GetView<PlayerLogic> {
                       ),
                       // flex: 1,
                     ),
+                    _buildHandler(context),
                     Padding(
                       padding: const EdgeInsets.only(
                           top: 0, left: 15, right: 15, bottom: 15),
@@ -167,17 +169,73 @@ class PlayerPage extends GetView<PlayerLogic> {
     );
   }
 
-  Widget _buildController(BuildContext context) {
-    return Obx(() {
-      return Row(
+  Widget _buildHandler(BuildContext context) {
+    return Container(
+      height: 100,
+      child: Row(
         children: [
           ImageMenuWidget(
-            'images/common/icon_song_play_type_1.png',
-            40.0,
+            'images/common/icon_dislike.png',
+            40,
             onTap: () {},
-          )
+            onTapWithDeatil: (TapDownDetails details) {
+              DialogUtil.showPopupMenu(context, details.globalPosition.dx,
+                  details.globalPosition.dy, ["测试", "测试2"], (value) {
+                print("callback:$value");
+              });
+            },
+          ),
+          ImageMenuWidget(
+            'images/common/icon_song_download.png',
+            40,
+            onTap: () {},
+          ),
+          ImageMenuWidget(
+            'images/common/bfc.png',
+            40,
+            onTap: () {},
+          ),
+          ImageMenuWidget(
+            'images/common/icon_song_more.png',
+            40,
+            onTap: () {},
+          ),
         ],
-      );
-    });
+      ),
+    );
+  }
+
+  Widget _buildController(BuildContext context) {
+    // return Obx(() {
+    return Row(
+      children: [
+        ImageMenuWidget(
+          'images/common/icon_song_play_type_1.png',
+          40.0,
+          onTap: () {},
+        ),
+        ImageMenuWidget(
+          'images/common/icon_song_left.png',
+          40.0,
+          onTap: () {},
+        ),
+        ImageMenuWidget(
+          'images/common/icon_song_play.png',
+          60.0,
+          onTap: () {},
+        ),
+        ImageMenuWidget(
+          'images/common/icon_song_right.png',
+          40.0,
+          onTap: () {},
+        ),
+        ImageMenuWidget(
+          'images/common/icon_play_songs.png',
+          40,
+          onTap: () {},
+        ),
+      ],
+    );
+    // });
   }
 }
