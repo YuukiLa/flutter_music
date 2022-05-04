@@ -3,10 +3,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/enums/play_mode.dart';
+import 'package:unknown/common/enums/play_state.dart';
+import 'package:unknown/common/service/player_service.dart';
 import 'package:unknown/common/utils/dialog.dart';
 import 'package:unknown/common/widget/image_menu.dart';
 import 'package:unknown/common/widget/song_progress.dart';
+import 'package:unknown/page/player/widget/music_list.dart';
 
+import '../../common/model/song.dart';
 import 'player_logic.dart';
 
 class PlayerPage extends GetView<PlayerLogic> {
@@ -14,53 +19,57 @@ class PlayerPage extends GetView<PlayerLogic> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          controller.state.currsong.id.isEmpty
-              ? Image.asset(
-                  controller.state.currsong.imgUrl,
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit.fitHeight,
-                )
-              : Image.network(
-                  controller.state.currsong.imgUrl,
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit.fitHeight,
+    return Obx(() {
+      Song currSong = PlayerService.instance.currSong.value;
+      PlayerService.instance.playState.value == PlayState.PALYING
+          ? controller.animationController.forward()
+          : controller.animationController.stop();
+      return Scaffold(
+        body: Stack(
+          children: [
+            currSong.id.isEmpty
+                ? Image.asset(
+                    currSong.imgUrl,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.fitHeight,
+                  )
+                : Image.network(
+                    currSong.imgUrl,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.fitHeight,
+                  ),
+            ClipRect(
+              // 这个必须有不然会全部模糊
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaY: 50,
+                  sigmaX: 50,
                 ),
-          ClipRect(
-            // 这个必须有不然会全部模糊
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaY: 50,
-                sigmaX: 50,
+                child: Container(),
               ),
-              child: Container(),
             ),
-          ),
-          AppBar(
-            centerTitle: true,
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-            iconTheme: IconThemeData(color: Colors.white),
-            backgroundColor: Colors.transparent,
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  controller.state.currsong.title,
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-                Text(
-                  controller.state.currsong.artist,
-                  style: TextStyle(fontSize: 12, color: Colors.white70),
-                ),
-              ],
+            AppBar(
+              centerTitle: true,
+              systemOverlayStyle: SystemUiOverlayStyle.light,
+              iconTheme: IconThemeData(color: Colors.white),
+              backgroundColor: Colors.transparent,
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    currSong.title,
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Text(
+                    currSong.artist,
+                    style: TextStyle(fontSize: 12, color: Colors.white70),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Obx(() {
-            return Container(
+            Container(
                 margin: EdgeInsets.only(
                     top: kToolbarHeight + MediaQuery.of(context).padding.top),
                 child: Column(
@@ -115,6 +124,7 @@ class PlayerPage extends GetView<PlayerLogic> {
                                                         child: controller
                                                                 .state
                                                                 .currsong
+                                                                .value
                                                                 .id
                                                                 .isEmpty
                                                             ? SizedBox()
@@ -122,6 +132,7 @@ class PlayerPage extends GetView<PlayerLogic> {
                                                                 controller
                                                                     .state
                                                                     .currsong
+                                                                    .value
                                                                     .imgUrl,
                                                                 width: 180,
                                                                 height: 180,
@@ -162,11 +173,11 @@ class PlayerPage extends GetView<PlayerLogic> {
                 )
                 // height: 400,
                 // color: Colors.black,
-                );
-          })
-        ],
-      ),
-    );
+                ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildHandler(BuildContext context) {
@@ -206,36 +217,65 @@ class PlayerPage extends GetView<PlayerLogic> {
   }
 
   Widget _buildController(BuildContext context) {
-    // return Obx(() {
-    return Row(
-      children: [
-        ImageMenuWidget(
-          'images/common/icon_song_play_type_1.png',
-          40.0,
-          onTap: () {},
-        ),
-        ImageMenuWidget(
-          'images/common/icon_song_left.png',
-          40.0,
-          onTap: () {},
-        ),
-        ImageMenuWidget(
-          'images/common/icon_song_play.png',
-          60.0,
-          onTap: () {},
-        ),
-        ImageMenuWidget(
-          'images/common/icon_song_right.png',
-          40.0,
-          onTap: () {},
-        ),
-        ImageMenuWidget(
-          'images/common/icon_play_songs.png',
-          40,
-          onTap: () {},
-        ),
-      ],
-    );
-    // });
+    return Obx(() {
+      String modeImg = "images/common/icon_song_play_type_1.png";
+      if (PlayerService.instance.playMode.value == PlayMode.SINGLE) {
+        modeImg = "images/common/icon_song_single_circle.png";
+      } else if (PlayerService.instance.playMode.value == PlayMode.SEQUENCE) {
+        modeImg = "images/common/icon_songs_circle.png";
+      } else {
+        modeImg = "images/common/icon_songs_random.png";
+      }
+      return Row(
+        children: [
+          ImageMenuWidget(
+            modeImg,
+            40.0,
+            onTap: () {
+              PlayerService.instance.changePlayMode();
+            },
+          ),
+          ImageMenuWidget(
+            'images/common/icon_song_left.png',
+            40.0,
+            onTap: () {
+              controller.skip(false);
+            },
+          ),
+          ImageMenuWidget(
+            PlayerService.instance.playState.value == PlayState.PALYING
+                ? 'images/common/icon_song_pause.png'
+                : 'images/common/icon_song_play.png',
+            60.0,
+            onTap: controller.changePlayState,
+          ),
+          ImageMenuWidget(
+            'images/common/icon_song_right.png',
+            40.0,
+            onTap: () {
+              controller.skip(true);
+            },
+          ),
+          ImageMenuWidget(
+            'images/common/icon_play_songs.png',
+            40,
+            onTap: () {
+              showModalBottomSheet(
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: false,
+                  // 全屏还是半屏
+                  isDismissible: true,
+                  // 是否可以点击外部执行关闭
+                  context: context,
+                  enableDrag: true,
+                  // 是否允许手动关闭
+                  builder: (BuildContext context) {
+                    return MusicList();
+                  });
+            },
+          ),
+        ],
+      );
+    });
   }
 }

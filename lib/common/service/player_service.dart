@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/enums/play_mode.dart';
+import 'package:unknown/common/enums/play_state.dart';
 import 'package:unknown/common/service/audio_player_handler.dart';
 
 import '../model/song.dart';
@@ -9,6 +11,10 @@ import '../model/song.dart';
 class PlayerService extends GetxService {
   static PlayerService instance = Get.find();
   late UnknownAudioPlayerHandler _audioHandler;
+  Rx<PlayState> playState = PlayState.STOP.obs;
+  Rx<PlayMode> playMode = PlayMode.SEQUENCE.obs;
+  Rx<Song> currSong = Song(
+      "", "无播放源", "", "", "", "", "", "", "images/common/bet.png", 0, "", true).obs;
   UnknownAudioPlayerHandler get audioHandler => _audioHandler;
 
   Future<PlayerService> init() async {
@@ -23,7 +29,35 @@ class PlayerService extends GetxService {
         androidShowNotificationBadge: false,
       ),
     );
+    _listenToPlaybackState();
+    _listenSongChange();
     return this;
+  }
+
+  void _listenSongChange() {
+    _audioHandler.setSongChangeListener((Song song) {
+      currSong.value=song;
+    });
+  }
+  //监听播放状态
+  void _listenToPlaybackState() {
+    _audioHandler.playbackState.listen((playbackState) {
+      final isPlaying = playbackState.playing;
+      final processingState = playbackState.processingState;
+      if (processingState == AudioProcessingState.loading ||
+          processingState == AudioProcessingState.buffering) {
+        // 加载中
+        playState.value = PlayState.LOADING;
+      } else if (!isPlaying) {
+        // 没有播放
+        playState.value = PlayState.PAUSE;
+      } else if (processingState != AudioProcessingState.completed) {
+        // 播放中
+        playState.value = PlayState.PALYING;
+      } else if (isPlaying) {
+        // playButtonNotifier.value = ButtonState.playing;
+      }
+    });
   }
 
   play(Song song) async {
@@ -31,6 +65,50 @@ class PlayerService extends GetxService {
     await _audioHandler.addSong(song);
     _audioHandler.playIndex(_audioHandler.songsLen - 1);
     // _audioHandler.play();
+  }
+
+  playSongs(List<Song> songs) {
+    _audioHandler.changeQueueLists(songs);
+  }
+  playIndex(int index) {
+    _audioHandler.playIndex(index);
+  }
+
+  resume() {
+    _audioHandler.play();
+  }
+
+  pause() {
+    _audioHandler.pause();
+  }
+
+  seek(double position) {
+    _audioHandler.seek(Duration(milliseconds: position.toInt()));
+  }
+
+  next() {
+    _audioHandler.skipToNext();
+  }
+
+  previous() {
+    _audioHandler.skipToPrevious();
+  }
+
+  changePlayMode() {
+    switch(playMode.value) {
+      case PlayMode.SEQUENCE:
+        playMode.value=PlayMode.RANDOM;
+        _audioHandler.setPlayMode(PlayMode.RANDOM);
+        break;
+      case PlayMode.RANDOM:
+        playMode.value=PlayMode.SINGLE;
+        _audioHandler.setPlayMode(PlayMode.SINGLE);
+        break;
+      case PlayMode.SINGLE:
+        playMode.value=PlayMode.SEQUENCE;
+        _audioHandler.setPlayMode(PlayMode.SEQUENCE);
+        break;
+    }
   }
 
   StreamSubscription<Duration> addPlayingListener(Function call) {

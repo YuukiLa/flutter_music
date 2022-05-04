@@ -22,6 +22,10 @@ class MediaController extends GetxController {
     Platform.QQ:QQ(),
   };
 
+  changeCookie(String source) {
+    providers[source]!.handleChangeCookie();
+  }
+
   String queryStringify(Map<String,String> params) {
     var arr = [];
     params.forEach((key, value) => arr.add("$key=$value"));
@@ -72,5 +76,8 @@ class MediaController extends GetxController {
     return await providers[source]!.playlistFilter();
   }
 
+  String getLoginUrl(String source) {
+    return providers[source]!.getLoginUrl();
+  }
 
 }

@@ -8,26 +8,43 @@ import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:unknown/common/enums/platform.dart';
+import 'package:unknown/common/enums/sp_key.dart';
 import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
 import 'package:unknown/common/provider/abstract_provider.dart';
+import 'package:unknown/common/service/sp_service.dart';
 
 import '../model/song.dart';
 
 class Netease extends AbstractProvider {
   static const channel = MethodChannel('unknown/neteaseEnc');
-  static final dio = Dio(BaseOptions(headers: {
-    "Referer": "https://music.163.com",
-    "Origin": "https://music.163.com",
-    "authority": "music.163.com",
-    "User-Agent":
-        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
-    "Content-Type": "application/x-www-form-urlencoded",
-    "cookie": "NMTID=00OV7gTWb1-5yFN3kAujDgyS5pvnkEAAAGAYSrsGQ",
-    // "cookie": "_iuqxldmzr_=32; _ntes_nuid=a82ed4abdad948ae4ecdba71bf4ba8a8; WM_TID=GkalpOJKWpFAQVRFAEdvEuu2zrQKC3uj; _ntes_nnid=a82ed4abdad948ae4ecdba71bf4ba8a8,1622347505950; NMTID=00O-xs9VfjspuHjMEIBoCUi6aeNrl4AAAF6V_oUvA; WEVNSM=1.0.0; WNMCID=qvblxb.1624973645128.01.0; _ns=NS1.2.1778974413.1641207971; JSESSIONID-WYYY=WmQhiZ4Y%5CfwtD%5CkSBWBvKEHMn%2FcIf1Es4pq4ilt66%5CsVN86uJvomaCBtBv4e9nIIJZylT%2FVYKOM6K2rEtAOlDdnKzey9Yx4MggjqCTBauewfSDt8us3JDX2dNqQNwnPjgqT46FVmvwx6%5CxzFuxqjF04vuu%5ChE7ibZBFsHxHQZQW%5CNdpI%3A1643693262143; WM_NI=ylzrpufQYoFhs6M4o3XQWKTWuLGnpzpD2yfX6%2FQ%2BIAGyGLO71iqHoMSnLIUbDAog%2FHe1eDKbEHNNyof2ZyDskFaOmirN1W31JLQhIPXQ%2FnC474eOoEiYPYr9Z0ARQ%2FQZT2E%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6ee96e57eb3eff8a3ce44a8968aa7c14f868f8abbaa7a8fb0af8bd670acb1fb90c12af0fea7c3b92abbb4b693f37fa68f9790c564b1ea83d5ee399c8f99acd75db794898ff372b49cfe9ae554f6f19fcccc4b85a789adce3df3b7bfa9ee4791b284aad86a889fa188ae44a7efaba5ca6a879882affc65a6ee969ac779a99aafb0f063b292ffb8b23b8a949f89cc5c9c8fe18fc240f5ecabb0ee4fab87a0baf1339af08fb3d42593869cd3c837e2a3"
-  }));
+  late var dio;
+  Netease() {
+    _initDio();
+  }
+
+  handleChangeCookie() {
+    _initDio();
+  }
+
+  _initDio(){
+    var cookie = SpService.to.getString(SpKeyConst.getCookieKey(Platform.Netease));
+    if(cookie=="") {
+      cookie="NMTID=00OV7gTWb1-5yFN3kAujDgyS5pvnkEAAAGAYSrsGQ";
+    }
+    dio=Dio(BaseOptions(headers: {
+      "Referer": "https://music.163.com",
+      "Origin": "https://music.163.com",
+      "authority": "music.163.com",
+      "User-Agent":
+      "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "cookie": cookie,
+      // "cookie": "_iuqxldmzr_=32; _ntes_nuid=a82ed4abdad948ae4ecdba71bf4ba8a8; WM_TID=GkalpOJKWpFAQVRFAEdvEuu2zrQKC3uj; _ntes_nnid=a82ed4abdad948ae4ecdba71bf4ba8a8,1622347505950; NMTID=00O-xs9VfjspuHjMEIBoCUi6aeNrl4AAAF6V_oUvA; WEVNSM=1.0.0; WNMCID=qvblxb.1624973645128.01.0; _ns=NS1.2.1778974413.1641207971; JSESSIONID-WYYY=WmQhiZ4Y%5CfwtD%5CkSBWBvKEHMn%2FcIf1Es4pq4ilt66%5CsVN86uJvomaCBtBv4e9nIIJZylT%2FVYKOM6K2rEtAOlDdnKzey9Yx4MggjqCTBauewfSDt8us3JDX2dNqQNwnPjgqT46FVmvwx6%5CxzFuxqjF04vuu%5ChE7ibZBFsHxHQZQW%5CNdpI%3A1643693262143; WM_NI=ylzrpufQYoFhs6M4o3XQWKTWuLGnpzpD2yfX6%2FQ%2BIAGyGLO71iqHoMSnLIUbDAog%2FHe1eDKbEHNNyof2ZyDskFaOmirN1W31JLQhIPXQ%2FnC474eOoEiYPYr9Z0ARQ%2FQZT2E%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6ee96e57eb3eff8a3ce44a8968aa7c14f868f8abbaa7a8fb0af8bd670acb1fb90c12af0fea7c3b92abbb4b693f37fa68f9790c564b1ea83d5ee399c8f99acd75db794898ff372b49cfe9ae554f6f19fcccc4b85a789adce3df3b7bfa9ee4791b284aad86a889fa188ae44a7efaba5ca6a879882affc65a6ee969ac779a99aafb0f063b292ffb8b23b8a949f89cc5c9c8fe18fc240f5ecabb0ee4fab87a0baf1339af08fb3d42593869cd3c837e2a3"
+    }));
+  }
   // ..interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options,RequestInterceptorHandler handler) {
   //   print(
   //       "\n================================= 请求数据 =================================");
@@ -366,6 +383,11 @@ class Netease extends AbstractProvider {
 
   bool is_playable(song) {
     return song["fee"] != 4 && song["fee"] != 1;
+  }
+
+  @override
+  String getLoginUrl() {
+    return "https://music.163.com/#/login";
   }
 
   // static String? getUrlParams(String key, String url) {

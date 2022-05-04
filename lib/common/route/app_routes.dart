@@ -3,4 +3,5 @@ class AppRoutes {
   static const String SONG_LIST = "/song_list";
   static const String SEARCH = "/search";
   static const String PLAYER = "/player";
+  static const String WEB = "/web";
 }

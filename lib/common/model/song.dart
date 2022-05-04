@@ -17,6 +17,10 @@ class Song {
   late int time;
   late bool disabled;
 
+  static Song emptySong() {
+    return Song("", "", "", "", "", "", "", "", "", 0, "", true);
+  }
+
   Song(
       this.id,
       this.title,

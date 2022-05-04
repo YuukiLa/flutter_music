@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/service/player_service.dart';
+import 'package:unknown/page/account/account_index.dart';
 import 'package:unknown/page/play_list/play_list_index.dart';
 import 'package:unknown/page/player/player_index.dart';
 
@@ -28,8 +30,14 @@ class MainPage extends GetView<MainLogic> {
           onHorizontalDragUpdate: controller.onHorizontalDragUpdate,
           onHorizontalDragEnd: controller.onHorizontalDragEnd,
           child: ClipOval(
-            child: Image.network(
-              "https://i2.hdslb.com/bfs/archive/8173bcb88156b8d5cea824a866bd276bb32a01d8.jpg@672w_378h_1c.webp",
+            child: PlayerService.instance.currSong.value.id==""?
+            Image.asset(
+              PlayerService.instance.currSong.value.imgUrl,
+              width: 65,
+              height: 65,
+              fit: BoxFit.cover,
+            ):Image.network(
+              PlayerService.instance.currSong.value.imgUrl,
               width: 65,
               height: 65,
               fit: BoxFit.cover,
@@ -47,9 +55,7 @@ class MainPage extends GetView<MainLogic> {
           children: [
             PlayListPage(),
             // PlayerPage(),
-            Center(
-              child: Text("3"),
-            ),
+            AccountPage(),
           ],
           physics: const NeverScrollableScrollPhysics(),
           controller: controller.pageController,

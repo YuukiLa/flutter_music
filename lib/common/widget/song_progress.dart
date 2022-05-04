@@ -13,7 +13,7 @@ class SongProgressWidget extends GetView<PlayerLogic> {
         return Row(
           children: [
             Text(
-              "${TimeFormatUtil.timeFormat(controller.state.currPosition.value)}",
+              TimeFormatUtil.timeFormat(controller.state.currPosition.value),
               style: const TextStyle(fontSize: 12, color: Colors.white),
             ),
             Expanded(
@@ -26,17 +26,19 @@ class SongProgressWidget extends GetView<PlayerLogic> {
                   ),
                   child: Slider(
                     value: controller.state.currPosition.value.toDouble(),
-                    onChanged: (data) {},
+                    onChanged: (data) {
+                      controller.progressChange(data);
+                    },
                     onChangeStart: (data) {},
                     onChangeEnd: (data) {},
                     activeColor: Colors.white,
                     inactiveColor: Colors.white30,
                     min: 0,
-                    max: controller.state.currsong.time.toDouble(),
+                    max: controller.state.currsong.value.time.toDouble(),
                   )),
             ),
             Text(
-              TimeFormatUtil.timeFormat(controller.state.currsong.time),
+              TimeFormatUtil.timeFormat(controller.state.currsong.value.time),
               style: const TextStyle(fontSize: 12, color: Colors.white30),
             ),
           ],

@@ -7,6 +7,8 @@ abstract class AbstractProvider {
   getPlaylist(String url);
   getSongUrl(String id);
   Future<PlaylistFilter> playlistFilter();
+  String getLoginUrl();
+  handleChangeCookie();
 
   String? getUrlParams(String key, String url) {
     if (url == "") {

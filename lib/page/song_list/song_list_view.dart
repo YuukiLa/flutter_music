@@ -61,6 +61,7 @@ class SongListPage extends GetView<SongListLogic> {
                               )),
                               Expanded(
                                   child: GestureDetector(
+                                    onTap: controller.playAll,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [

@@ -12,17 +12,37 @@ import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
 import 'package:unknown/common/provider/abstract_provider.dart';
 
+import '../enums/sp_key.dart';
 import '../model/song.dart';
+import '../service/sp_service.dart';
 
 class QQ extends AbstractProvider {
-  static final dio = Dio(BaseOptions(headers: {
-    "referer": "https://y.qq.com/",
-    "origin": "https://y.qq.com/",
-    "authority": "c.y.qq.com",
-    "user-agent":
-        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
-    "Content-Type": "application/x-www-form-urlencoded"
-  }));
+  late var dio;
+
+  QQ() {
+    _initDio();
+  }
+
+  handleChangeCookie() {
+    _initDio();
+  }
+
+
+  _initDio() {
+    var cookie = SpService.to.getString(SpKeyConst.getCookieKey(Platform.QQ));
+    if(cookie=="") {
+      cookie="NMTID=00OV7gTWb1-5yFN3kAujDgyS5pvnkEAAAGAYSrsGQ";
+    }
+    dio= Dio(BaseOptions(headers: {
+      "referer": "https://y.qq.com/",
+      "origin": "https://y.qq.com/",
+      "authority": "c.y.qq.com",
+      "user-agent":
+      "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "cookie": cookie
+    }));
+  }
   // ..interceptors.add(InterceptorsWrapper(
   //     onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
   //   print(
@@ -49,7 +69,10 @@ class QQ extends AbstractProvider {
   //   print("\n");
   //   handler.next(e);
   // }));
-
+  @override
+  String getLoginUrl() {
+    return "https://y.qq.com/portal/profile.html";
+  }
   @override
   getPlaylist(String url) {
     var list_id = getUrlParams('list_id', url)?.split('_');

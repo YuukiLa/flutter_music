@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/animation.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/enums/play_state.dart';
 import 'package:unknown/common/service/player_service.dart';
 
 import 'player_state.dart';
@@ -14,7 +17,7 @@ class PlayerLogic extends GetxController with GetTickerProviderStateMixin {
 
   @override
   void onInit() {
-    state.currsong = PlayerService.instance.audioHandler.currPlaying;
+    state.currsong.value = PlayerService.instance.audioHandler.currPlaying;
     animationController =
         AnimationController(duration: Duration(seconds: 20), vsync: this);
     animationController.addStatusListener((status) {
@@ -25,8 +28,20 @@ class PlayerLogic extends GetxController with GetTickerProviderStateMixin {
         animationController.forward();
       }
     });
+    state.listLen.value = PlayerService.instance.audioHandler.songsLen;
+    state.list.addAll(PlayerService.instance.audioHandler.songList);
+    state.isPlaying.value = PlayerService.instance.audioHandler.isPlaying;
+    if(state.isPlaying.value) {
+      animationController.forward();
+    }
+    state.currPosition.value = PlayerService.instance.audioHandler.playPosition;
     //监听播放进度
     listener = PlayerService.instance.addPlayingListener((Duration position) {
+      // print("${position.inMilliseconds}---${state.currsong.value.time}");
+      if(position.inMilliseconds>state.currsong.value.time) {
+        state.currPosition.value = state.currsong.value.time;
+        return;
+      }
       state.currPosition.value = position.inMilliseconds;
     });
     super.onInit();
@@ -36,8 +51,41 @@ class PlayerLogic extends GetxController with GetTickerProviderStateMixin {
     state.switchIndex.value = state.switchIndex.value == 0 ? 1 : 0;
   }
 
+  //拖动进度条
+  progressChange(data) {
+    print(data);
+    PlayerService.instance.seek(data);
+  }
+
+  skip(bool isNext) {
+    isNext ? PlayerService.instance.next():PlayerService.instance.previous();
+    state.currsong.value = state.list[PlayerService.instance.audioHandler.curIndex];
+  }
+
+  //切换播放状态
+  changePlayState() {
+    if(state.currsong.value.url=='') {
+      return;
+    }
+    if(PlayerService.instance.playState.value == PlayState.PALYING) {
+      PlayerService.instance.pause();
+      animationController.stop();
+    }else {
+      PlayerService.instance.resume();
+      animationController.forward();
+    }
+  }
+
+  //播放指定下标
+  playIndex(int index) {
+    PlayerService.instance.playIndex(index);
+    state.currsong.value = state.list[index];
+  }
+
+
   @override
   void onClose() {
+    animationController.dispose();
     PlayerService.instance.removePlayingListener(listener);
     super.onClose();
   }

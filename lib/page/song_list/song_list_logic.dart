@@ -2,6 +2,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/service/media_service.dart';
+import 'package:unknown/common/service/player_service.dart';
 import 'package:unknown/common/utils/dialog.dart';
 
 import '../../common/provider/netease.dart';
@@ -41,6 +42,11 @@ class SongListLogic extends GetxController {
       alpha = 1;
     }
     state.appBarAlpha.value = alpha;
+  }
+
+  //播放全部
+  playAll() {
+    PlayerService.instance.playSongs(state.songs);
   }
 
   onSongClick(int index) async {
