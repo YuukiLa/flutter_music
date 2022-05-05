@@ -25,5 +25,9 @@ class AccountLogic extends GetxController {
     if (qqUser != null) {
       state.qqUser.value = qqUser;
     }
+    var neteaseUser = await MediaController.to.getUserInfo(Platform.Netease);
+    if (neteaseUser != null) {
+      state.neteaseUser.value = neteaseUser;
+    }
   }
 }

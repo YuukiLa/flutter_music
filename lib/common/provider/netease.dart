@@ -401,14 +401,19 @@ class Netease extends AbstractProvider {
       return null;
     }
     const url = "https://music.163.com/api/nuser/account/get";
-    var encrypt_req_data = weapi("{}");
+    var encrypt_req_data = await weapi(convert.jsonEncode({}));
+    print(encrypt_req_data);
+    print(cookie.slice(0,1000));
+    print(cookie.slice(1000));
+    addInterceptors(dio);
     var resp = await dio.post(url, data: encrypt_req_data);
-    var data = convert.jsonDecode(resp.data);
-    if (data["data"]["account"] != null) {
+    var data =resp.data;
+    print(data);
+    if (data["account"] != null) {
       return UserModel(
-          data["data"]["account"]["id"],
-          data["data"]["account"]["nickname"],
-          data["data"]["account"]["avatarUrl"],
+          data["profile"]["id"].toString(),
+          data["profile"]["nickname"],
+          data["profile"]["avatarUrl"],
           Platform.Netease);
     }
     return null;

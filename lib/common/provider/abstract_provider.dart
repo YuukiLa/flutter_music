@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../model/playlist.dart';
 import '../model/playlist_filter.dart';
 import '../model/song.dart';
@@ -12,6 +14,7 @@ abstract class AbstractProvider {
   getUserInfo();
   getUserPlayList();
   getUserRecommand();
+  Future<List<Song>> search(String keyword, int currPage);
 
   String? getUrlParams(String key, String url) {
     if (url == "") {
@@ -34,6 +37,34 @@ abstract class AbstractProvider {
 
     return map[key] ?? "";
   }
+  addInterceptors(Dio dio) {
+    dio.interceptors.add(InterceptorsWrapper(
+        onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
+          print(
+              "\n================================= 请求数据 =================================");
+          print("method = ${options.method.toString()}");
+          print("url = ${options.uri.toString()}");
+          print("headers = ${options.headers}");
+          print("params = ${options.queryParameters}");
+          handler.next(options);
+        }, onResponse: (Response response, ResponseInterceptorHandler handler) {
+      print(
+          "\n================================= 响应数据开始 =================================");
+      print("code = ${response.statusCode}");
+      print("data = ${response.data}");
+      print(
+          "================================= 响应数据结束 =================================\n");
+      handler.next(response);
+    }, onError: (DioError e, ErrorInterceptorHandler handler) {
+      print(
+          "\n=================================错误响应数据 =================================");
+      print("type = ${e.type}");
+      print("message = ${e.message}");
+      print("stackTrace = ${e.stackTrace}");
+      print("\n");
+      handler.next(e);
+    }));
+  }
 
-  Future<List<Song>> search(String keyword, int currPage);
+
 }
