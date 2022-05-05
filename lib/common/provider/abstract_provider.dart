@@ -9,6 +9,9 @@ abstract class AbstractProvider {
   Future<PlaylistFilter> playlistFilter();
   String getLoginUrl();
   handleChangeCookie();
+  getUserInfo();
+  getUserPlayList();
+  getUserRecommand();
 
   String? getUrlParams(String key, String url) {
     if (url == "") {
@@ -18,5 +21,19 @@ abstract class AbstractProvider {
     return parse.queryParameters[key];
   }
 
-  Future<List<Song>> search(String keyword,int currPage);
+  String? getCookieParam(String cookie, String key) {
+    if (cookie == "") {
+      return null;
+    }
+    var map = {};
+    cookie.split(";").forEach((e) {
+      var eIndex = e.indexOf("=");
+
+      map[e.substring(0, eIndex).trim()] = e.substring(eIndex + 1).trim();
+    });
+
+    return map[key] ?? "";
+  }
+
+  Future<List<Song>> search(String keyword, int currPage);
 }

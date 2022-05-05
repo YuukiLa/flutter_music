@@ -10,6 +10,7 @@ import 'package:unknown/common/model/category.dart';
 import 'package:unknown/common/model/filter.dart';
 import 'package:unknown/common/model/playlist.dart';
 import 'package:unknown/common/model/playlist_filter.dart';
+import 'package:unknown/common/model/user.dart';
 import 'package:unknown/common/provider/abstract_provider.dart';
 
 import '../enums/sp_key.dart';
@@ -17,62 +18,67 @@ import '../model/song.dart';
 import '../service/sp_service.dart';
 
 class QQ extends AbstractProvider {
-  late var dio;
+  late Dio dio;
 
   QQ() {
     _initDio();
   }
 
+  @override
   handleChangeCookie() {
     _initDio();
   }
 
-
   _initDio() {
     var cookie = SpService.to.getString(SpKeyConst.getCookieKey(Platform.QQ));
-    if(cookie=="") {
-      cookie="NMTID=00OV7gTWb1-5yFN3kAujDgyS5pvnkEAAAGAYSrsGQ";
+    if (cookie == "") {
+      cookie = "NMTID=00OV7gTWb1-5yFN3kAujDgyS5pvnkEAAAGAYSrsGQ";
     }
-    dio= Dio(BaseOptions(headers: {
+    dio = Dio(BaseOptions(headers: {
       "referer": "https://y.qq.com/",
       "origin": "https://y.qq.com/",
       "authority": "c.y.qq.com",
       "user-agent":
-      "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
       "Content-Type": "application/x-www-form-urlencoded",
       "cookie": cookie
     }));
   }
-  // ..interceptors.add(InterceptorsWrapper(
-  //     onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
-  //   print(
-  //       "\n================================= 请求数据 =================================");
-  //   print("method = ${options.method.toString()}");
-  //   print("url = ${options.uri.toString()}");
-  //   print("headers = ${options.headers}");
-  //   print("params = ${options.queryParameters}");
-  //   handler.next(options);
-  // }, onResponse: (Response response, ResponseInterceptorHandler handler) {
-  //   print(
-  //       "\n================================= 响应数据开始 =================================");
-  //   print("code = ${response.statusCode}");
-  //   print("data = ${response.data}");
-  //   print(
-  //       "================================= 响应数据结束 =================================\n");
-  //   handler.next(response);
-  // }, onError: (DioError e, ErrorInterceptorHandler handler) {
-  //   print(
-  //       "\n=================================错误响应数据 =================================");
-  //   print("type = ${e.type}");
-  //   print("message = ${e.message}");
-  //   print("stackTrace = ${e.stackTrace}");
-  //   print("\n");
-  //   handler.next(e);
-  // }));
+
+  _addInterceptors(Dio dio) {
+    dio.interceptors.add(InterceptorsWrapper(
+        onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
+      print(
+          "\n================================= 请求数据 =================================");
+      print("method = ${options.method.toString()}");
+      print("url = ${options.uri.toString()}");
+      print("headers = ${options.headers}");
+      print("params = ${options.queryParameters}");
+      handler.next(options);
+    }, onResponse: (Response response, ResponseInterceptorHandler handler) {
+      print(
+          "\n================================= 响应数据开始 =================================");
+      print("code = ${response.statusCode}");
+      print("data = ${response.data}");
+      print(
+          "================================= 响应数据结束 =================================\n");
+      handler.next(response);
+    }, onError: (DioError e, ErrorInterceptorHandler handler) {
+      print(
+          "\n=================================错误响应数据 =================================");
+      print("type = ${e.type}");
+      print("message = ${e.message}");
+      print("stackTrace = ${e.stackTrace}");
+      print("\n");
+      handler.next(e);
+    }));
+  }
+
   @override
   String getLoginUrl() {
     return "https://y.qq.com/portal/profile.html";
   }
+
   @override
   getPlaylist(String url) {
     var list_id = getUrlParams('list_id', url)?.split('_');
@@ -308,5 +314,76 @@ class QQ extends AbstractProvider {
       result.add(qq_convert_song(item));
     });
     return result;
+  }
+
+  @override
+  getUserInfo() async {
+    String cookie =
+        SpService.to.getString(SpKeyConst.getCookieKey(Platform.QQ));
+    var uin = getCookieParam(cookie, "uin");
+    print(uin);
+    if (uin == null) {
+      return null;
+    }
+    var targetUrl = "https://u.y.qq.com/cgi-bin/musicu.fcg?format=json&&" +
+        "loginUin=$uin&hostUin=0inCharset=utf8&outCharset=utf-8" +
+        "&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%2C%22cv%22%3A0%7D%2C%22vip" +
+        "%22%3A%7B%22module%22%3A%22userInfo.VipQueryServer%22%2C%22method%22%3A%22SRFVipQuery_V2%22%2C%22" +
+        "param%22%3A%7B%22uin_list%22%3A%5B%22$uin%22%5D%7D%7D%2C%22base%22%3A%7B%22module%22%3A%22" +
+        "userInfo.BaseUserInfoServer%22%2C%22method%22%3A%22get_user_baseinfo_v2%22%2C%22param%22%3A%7B%22" +
+        "vec_uin%22%3A%5B%22$uin%22%5D%7D%7D%7D";
+    // var params = {
+    //   "format": "json",
+    //   "loginUin": uin,
+    //   "hostUin": "0",
+    //   "inCharset": "utf-8",
+    //   "outCharset": "utf-8",
+    //   "platform": "y.qq.json",
+    //   "needNewCode": 0,
+    //   "data": {
+    //     "comm": {"ct": 24, "cv": 0},
+    //     "vip": {
+    //       "module": 'userInfo.VipQueryServer',
+    //       "method": 'SRFVipQuery_V2',
+    //       "param": {
+    //         "uin_list": [uin]
+    //       },
+    //     },
+    //     "base": {
+    //       "module": 'userInfo.BaseUserInfoServer',
+    //       "method": 'get_user_baseinfo_v2',
+    //       "param": {
+    //         "vec_uin": [uin]
+    //       },
+    //     },
+    //   }
+    // };
+    var copyOptions = dio.options.copyWith(responseType: ResponseType.plain);
+    copyOptions.headers = {
+      "authority": "u.y.qq.com",
+      "user-agent":
+          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
+      "cookie": cookie
+    };
+    var cDio = Dio(copyOptions);
+    var resp = await cDio.get(targetUrl);
+    var data = jsonDecode(resp.data);
+    if (data["code"] != 0) {
+      return null;
+    }
+    return UserModel(uin, data['base']['data']['map_userinfo'][uin]['nick'],
+        data['base']['data']['map_userinfo'][uin]['headurl'], Platform.QQ);
+  }
+
+  @override
+  getUserPlayList() {
+    // TODO: implement getUserPlayList
+    throw UnimplementedError();
+  }
+
+  @override
+  getUserRecommand() {
+    // TODO: implement getUserRecommand
+    throw UnimplementedError();
   }
 }

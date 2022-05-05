@@ -31,7 +31,7 @@ Map<String, dynamic> _$SongToJson(Song instance) => <String, dynamic>{
       'sourceUrl': instance.sourceUrl,
       'source': instance.source,
       'imgUrl': instance.imgUrl,
-      'time': instance.time,
       'url': instance.url,
+      'time': instance.time,
       'disabled': instance.disabled,
     };

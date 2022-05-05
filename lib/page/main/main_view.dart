@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/service/player_service.dart';
+import 'package:unknown/common/widget/keep_alive_wrapper.dart';
 import 'package:unknown/page/account/account_index.dart';
 import 'package:unknown/page/play_list/play_list_index.dart';
 import 'package:unknown/page/player/player_index.dart';
@@ -30,18 +31,19 @@ class MainPage extends GetView<MainLogic> {
           onHorizontalDragUpdate: controller.onHorizontalDragUpdate,
           onHorizontalDragEnd: controller.onHorizontalDragEnd,
           child: ClipOval(
-            child: PlayerService.instance.currSong.value.id==""?
-            Image.asset(
-              PlayerService.instance.currSong.value.imgUrl,
-              width: 65,
-              height: 65,
-              fit: BoxFit.cover,
-            ):Image.network(
-              PlayerService.instance.currSong.value.imgUrl,
-              width: 65,
-              height: 65,
-              fit: BoxFit.cover,
-            ),
+            child: PlayerService.instance.currSong.value.id == ""
+                ? Image.asset(
+                    PlayerService.instance.currSong.value.imgUrl,
+                    width: 65,
+                    height: 65,
+                    fit: BoxFit.cover,
+                  )
+                : Image.network(
+                    PlayerService.instance.currSong.value.imgUrl,
+                    width: 65,
+                    height: 65,
+                    fit: BoxFit.cover,
+                  ),
           ),
         ),
         // FloatingActionButton(
@@ -53,9 +55,9 @@ class MainPage extends GetView<MainLogic> {
             FloatingActionButtonLocation.miniCenterDocked,
         body: PageView(
           children: [
-            PlayListPage(),
+            KeepAliveWrapper(PlayListPage()),
             // PlayerPage(),
-            AccountPage(),
+            KeepAliveWrapper(AccountPage()),
           ],
           physics: const NeverScrollableScrollPhysics(),
           controller: controller.pageController,

@@ -12,6 +12,7 @@ class WebPage extends GetView<WebLogic> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: controller.getCookie,
+        backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.cookie),
       ),
       body: SafeArea(
@@ -22,7 +23,8 @@ class WebPage extends GetView<WebLogic> {
               crossPlatform: InAppWebViewOptions(
                 useShouldOverrideUrlLoading: true,
                 mediaPlaybackRequiresUserGesture: false,
-                userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
+                userAgent:
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
               ),
               android: AndroidInAppWebViewOptions(
                 useHybridComposition: true,

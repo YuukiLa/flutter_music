@@ -25,7 +25,9 @@ class PlayListLogic extends GetxController
     }
     DialogUtil.showLoading();
     var result = await MediaController.to.showPlaylistArray(
-        platforms[currTab], state.currPage[currTab] * 35, state.filter[currTab].recommend[state.currFilter[currTab]].id);
+        platforms[currTab],
+        state.currPage[currTab] * 35,
+        state.filter[currTab].recommend[state.currFilter[currTab]].id);
     // print(result);
     if (isRefresh) {
       state.playlist[currTab].clear();
@@ -54,7 +56,6 @@ class PlayListLogic extends GetxController
       await MediaController.to.getFilter(Platform.QQ)
     ]);
     await showPlaylist(true);
-
   }
 
   void onPlaylistTap(int index) {
@@ -63,22 +64,20 @@ class PlayListLogic extends GetxController
     // print(index);
     var playlist = state.playlist[state.currTab.value][index];
     Get.toNamed(AppRoutes.SONG_LIST,
-        arguments: {"id": playlist.id,"platform":playlist.source});
+        arguments: {"id": playlist.id, "platform": playlist.source});
   }
 
-  onTabChange() async{
+  onTabChange() async {
     state.currTab.value = tabController.index;
-    if(state.playlist[tabController.index].isEmpty) {
-
+    if (state.playlist[tabController.index].isEmpty) {
       await showPlaylist(true);
-
     }
   }
 
   Future<void> onRefresh() async {
     state.currPage[state.currTab.value] = 0;
     await showPlaylist(true);
-    refreshControllerMap[platforms[state.currTab.value]]?.loadComplete();
+    refreshControllerMap[platforms[state.currTab.value]]?.refreshCompleted();
   }
 
   Future<void> onLoading() async {
@@ -88,8 +87,8 @@ class PlayListLogic extends GetxController
   }
 
   onTagChange(int itemIndex) {
-    state.currFilter[state.currTab.value]=itemIndex;
-    if(itemIndex!=1) {
+    state.currFilter[state.currTab.value] = itemIndex;
+    if (itemIndex != 1) {
       showPlaylist(true);
     }
   }
