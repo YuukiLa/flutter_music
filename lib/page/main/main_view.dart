@@ -30,20 +30,26 @@ class MainPage extends GetView<MainLogic> {
           onHorizontalDragStart: controller.onHorizontalDragStart,
           onHorizontalDragUpdate: controller.onHorizontalDragUpdate,
           onHorizontalDragEnd: controller.onHorizontalDragEnd,
-          child: ClipOval(
-            child: PlayerService.instance.currSong.value.id == ""
-                ? Image.asset(
-                    PlayerService.instance.currSong.value.imgUrl,
-                    width: 65,
-                    height: 65,
-                    fit: BoxFit.cover,
-                  )
-                : Image.network(
-                    PlayerService.instance.currSong.value.imgUrl,
-                    width: 65,
-                    height: 65,
-                    fit: BoxFit.cover,
-                  ),
+          child: Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.yellow[800]!,width: 1),
+                borderRadius: BorderRadius.circular(65)
+            ),
+            child: ClipOval(
+              child: PlayerService.instance.currSong.value.id == ""
+                  ? Image.asset(
+                PlayerService.instance.currSong.value.imgUrl,
+                width: 65,
+                height: 65,
+                fit: BoxFit.cover,
+              )
+                  : Image.network(
+                PlayerService.instance.currSong.value.imgUrl,
+                width: 65,
+                height: 65,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
         // FloatingActionButton(

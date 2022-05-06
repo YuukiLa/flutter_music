@@ -53,7 +53,6 @@ class AccountLogic extends GetxController {
   }
 
   gotoPlaylist(String platform) async {
-    var data = await MediaController.to.getUserPlaylist(platform);
-    print(jsonEncode(data));
+    Get.toNamed(AppRoutes.USER_PLAYLIST,arguments: {"platform": platform});
   }
 }

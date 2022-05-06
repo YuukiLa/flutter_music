@@ -424,6 +424,7 @@ class Netease extends AbstractProvider {
           "https://music.163.com/#/playlist?id=${item['id']}",
           Platform.Netease);
       playlist.isSub = item["subscribed"];
+      playlist.count = item["trackCount"];
       list.add(playlist);
     });
     return list;

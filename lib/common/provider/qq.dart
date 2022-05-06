@@ -374,6 +374,7 @@ class QQ extends AbstractProvider {
                 "https://y.qq.com/n/ryqq/playlist/${item['tid']}",
                 Platform.QQ);
             playlist.isSub = false;
+            playlist.count = item["song_cnt"];
             list.add(playlist);
           }
         }
@@ -385,6 +386,7 @@ class QQ extends AbstractProvider {
             "https://y.qq.com/n/ryqq/playlist/${item['tid']}",
             Platform.QQ);
         playlist.isSub = false;
+        playlist.count = item["song_cnt"];
         list.add(playlist);
       }
     });
@@ -409,6 +411,7 @@ class QQ extends AbstractProvider {
             "https://y.qq.com/n/ryqq/playlist/${item['dissid']}",
             Platform.QQ);
         playlist.isSub = true;
+        playlist.count = item["song_cnt"];
         list.add(playlist);
       }
     });

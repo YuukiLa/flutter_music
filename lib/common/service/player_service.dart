@@ -14,7 +14,7 @@ class PlayerService extends GetxService {
   Rx<PlayState> playState = PlayState.STOP.obs;
   Rx<PlayMode> playMode = PlayMode.SEQUENCE.obs;
   Rx<Song> currSong = Song(
-      "", "无播放源", "", "", "", "", "", "", "images/common/bet.png", 0, "", true).obs;
+      "", "无播放源", "", "", "", "", "", "", "images/common/music.png", 0, "", true).obs;
   UnknownAudioPlayerHandler get audioHandler => _audioHandler;
 
   Future<PlayerService> init() async {
