@@ -12,26 +12,39 @@ class SongListLogic extends GetxController {
   final SongListState state = SongListState();
   late dynamic info;
   late String platform;
+  late bool isRecommand;
 
-
-  getSongList() async{
+  getSongList() async {
     DialogUtil.showLoading();
-    var res = await MediaController.to.getPlaylistSongs(platform,"/playlist?list_id=${state.id.value}");
+    var res = await MediaController.to
+        .getPlaylistSongs(platform, "/playlist?list_id=${state.id.value}");
     info = res["info"];
     state.title.value = info["title"];
     state.image.value = info["cover_img_url"];
     state.songs.addAll(res["tracks"]);
     DialogUtil.dismiss();
-    print(res["tracks"]);
-    print(state.songs.length);
+  }
+
+  getRecommand() async {
+    DialogUtil.showLoading();
+    var res = await MediaController.to.getRecommand(platform);
+    state.title.value = "每日推荐";
+    state.image.value = "https://s1.ax1x.com/2022/05/06/Ouajdf.jpg";
+    state.songs.addAll(res!);
+    DialogUtil.dismiss();
   }
 
   @override
   void onInit() {
-    super.onInit();
-    state.id.value = Get.arguments["id"];
+    isRecommand = Get.arguments["recommand"] ?? false;
+    state.id.value = Get.arguments["id"] ?? "";
     platform = Get.arguments["platform"];
-    getSongList();
+    if (isRecommand) {
+      getRecommand();
+    } else {
+      getSongList();
+    }
+    super.onInit();
   }
 
   onScroll(offset) {
@@ -50,6 +63,7 @@ class SongListLogic extends GetxController {
   }
 
   onSongClick(int index) async {
+    //TODO change to use playerservice
     await MediaController.to.play(state.songs[index]);
     print(index);
   }

@@ -83,6 +83,14 @@ class MediaController extends GetxController {
     return await providers[source]?.getUserInfo();
   }
 
+  Future<List<Song>?> getRecommand(String source) async {
+    return await providers[source]?.getUserRecommand();
+  }
+
+  Future<List<Playlist>?> getUserPlaylist(String source) async {
+    return await providers[source]?.getUserPlayList();
+  }
+
   String getLoginUrl(String source) {
     return providers[source]!.getLoginUrl();
   }

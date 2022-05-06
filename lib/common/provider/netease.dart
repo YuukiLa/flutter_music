@@ -229,22 +229,10 @@ class Netease extends AbstractProvider {
     var resp = await dio.post(
         "http://music.163.com/weapi/song/enhance/player/url?csrf_token=",
         data: await weapi(convert.jsonEncode(data)));
-    print(resp.data);
     var resData = convert.jsonDecode(resp.data);
     return resData["data"]?[0]?["url"] ?? "";
   }
 
-  // static Future<String> _aes_encrypt(String text, String sec_key, String algo) async {
-  //   AesCbc aes = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
-  //   var encrypt = await aes.encrypt(utf8.encode(text), secretKey: SecretKey(utf8.encode(sec_key)));
-  //   return utf8.decode(encrypt.cipherText);
-  // }
-  // static _rsa_encrypt(String text, String pubKey, String modulus) async {
-  //   text = text.split("").reversed.join("");
-  //   final algorithm = RsaPss(Sha256());
-  //   // BigInt.from();
-  //
-  // }
   static _create_secret_key(int size) {
     final _random = Random();
     const _availableChars = '0123456789abcdef';
@@ -402,16 +390,11 @@ class Netease extends AbstractProvider {
     }
     const url = "https://music.163.com/api/nuser/account/get";
     var encrypt_req_data = await weapi(convert.jsonEncode({}));
-    print(encrypt_req_data);
-    print(cookie.slice(0,1000));
-    print(cookie.slice(1000));
-    addInterceptors(dio);
     var resp = await dio.post(url, data: encrypt_req_data);
-    var data =resp.data;
-    print(data);
+    var data = resp.data;
     if (data["account"] != null) {
       return UserModel(
-          data["profile"]["id"].toString(),
+          data["profile"]["userId"].toString(),
           data["profile"]["nickname"],
           data["profile"]["avatarUrl"],
           Platform.Netease);
@@ -420,15 +403,74 @@ class Netease extends AbstractProvider {
   }
 
   @override
-  getUserPlayList() {
-    // TODO: implement getUserPlayList
-    throw UnimplementedError();
+  getUserPlayList() async {
+    UserModel user = UserModel.fromJson(convert.jsonDecode(
+        SpService.to.getString(SpKeyConst.getUserKey(Platform.Netease))));
+    var targetUrl = "https://music.163.com/api/user/playlist";
+    var req_data = {
+      "uid": user.id,
+      "limit": 1000,
+      "offset": 0,
+      "includeVideo": true,
+    };
+    var resp = await dio.post(targetUrl, data: req_data);
+    var data = convert.jsonDecode(resp.data);
+    var list = <Playlist>[];
+    data["playlist"].forEach((item) {
+      var playlist = Playlist(
+          item["coverImgUrl"],
+          item["name"],
+          "neplaylist_${item['id']}",
+          "https://music.163.com/#/playlist?id=${item['id']}",
+          Platform.Netease);
+      playlist.isSub = item["subscribed"];
+      list.add(playlist);
+    });
+    return list;
   }
 
   @override
-  getUserRecommand() {
-    // TODO: implement getUserRecommand
-    throw UnimplementedError();
+  getUserRecommand() async {
+    var targetUrl = "https://music.163.com/weapi/v2/discovery/recommend/songs";
+    var resp =
+        await dio.post(targetUrl, data: await weapi(convert.jsonEncode({})));
+    var data = convert.jsonDecode(resp.data);
+    var list = <Song>[];
+    data["recommend"].forEach((song_info) {
+      list.add(Song(
+          "netrack_${song_info['id']}",
+          song_info["name"],
+          song_info["artists"][0]["name"],
+          "neartist_${song_info['artists'][0]['id']}",
+          song_info["album"]["name"],
+          "nealbum_${song_info['album']['id']}",
+          "https://music.163.com/#/song?id=${song_info['id']}",
+          "netease",
+          song_info["album"]["picUrl"],
+          song_info["duration"],
+          "",
+          !is_playable(song_info)));
+    });
+    return list;
+  }
+
+  _recommandPlaylist() async {
+    const target_url = 'https://music.163.com/weapi/personalized/playlist';
+
+    var req_data = {
+      "limit": 30,
+      "total": true,
+      "n": 1000,
+    };
+    var req = await weapi(convert.jsonEncode(req_data));
+    var resp = await dio.post(target_url, data: req);
+    var data = resp.data;
+    var list = <Playlist>[];
+    data['result'].forEach((e) {
+      list.add(Playlist(e['picUrl'], e['name'], "neplaylist_${e['id']}",
+          "https://music.163.com/#/playlist?id=${e['id']}", Platform.Netease));
+    });
+    return list;
   }
 
   // static String? getUrlParams(String key, String url) {

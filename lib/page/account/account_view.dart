@@ -23,17 +23,17 @@ class AccountPage extends GetView<AccountLogic> {
             const SizedBox(
               height: 30,
             ),
-            _accountWidget(Platform.Netease),
+            _accountWidget(context, Platform.Netease),
             const SizedBox(
               height: 40,
             ),
-            _accountWidget(Platform.QQ),
+            _accountWidget(context, Platform.QQ),
           ],
         ));
     // });
   }
 
-  Widget _accountWidget(String source) {
+  Widget _accountWidget(BuildContext context, String source) {
     return Obx(() {
       UserModel user = source == Platform.Netease
           ? controller.state.neteaseUser.value
@@ -43,7 +43,7 @@ class AccountPage extends GetView<AccountLogic> {
           width: double.infinity,
           margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
           padding: const EdgeInsets.only(left: 5, right: 5),
-          height: 90,
+          height: isLogin ? 130 : 90,
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: const [
@@ -96,42 +96,93 @@ class AccountPage extends GetView<AccountLogic> {
                 ),
               ),
               Align(
-                alignment: Alignment.bottomCenter,
-                child: TextButton(
-                  onPressed: () {
-                    controller.goto(source);
-                  },
-                  child: isLogin
-                      ? Text(
-                          user.nickname,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                            color: Colors.black,
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "$source-未登录",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const Icon(
-                              Icons.chevron_right,
+                alignment: Alignment.topCenter,
+                child: Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  child: TextButton(
+                    onPressed: () {
+                      controller.goto(source);
+                    },
+                    child: isLogin
+                        ? Text(
+                            user.nickname,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
                               color: Colors.black,
                             ),
-                          ],
-                        ),
-                  style: ButtonStyle(
-                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "$source-未登录",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const Icon(
+                                Icons.chevron_right,
+                                color: Colors.black,
+                              ),
+                            ],
+                          ),
+                    style: ButtonStyle(
+                      overlayColor:
+                          MaterialStateProperty.all(Colors.transparent),
+                    ),
                   ),
                 ),
-              )
+              ),
+              isLogin
+                  ? Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  controller.gotoRecommand(source);
+                                },
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(
+                                      Icons.recommend,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    const Text("日推")
+                                  ],
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                            Expanded(
+                                child: InkWell(
+                                    onTap: () {
+                                      controller.gotoPlaylist(source);
+                                    },
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Icon(
+                                          Icons.queue_music_rounded,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                        const Text("歌单")
+                                      ],
+                                    )),
+                                flex: 1),
+                          ],
+                        ),
+                      ),
+                    )
+                  : const SizedBox()
             ],
           ));
     });

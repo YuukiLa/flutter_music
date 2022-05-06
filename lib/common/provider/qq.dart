@@ -45,8 +45,6 @@ class QQ extends AbstractProvider {
     }));
   }
 
-
-
   @override
   String getLoginUrl() {
     return "https://y.qq.com/portal/profile.html";
@@ -289,11 +287,15 @@ class QQ extends AbstractProvider {
     return result;
   }
 
-  @override
-  getUserInfo() async {
+  String? _getUin() {
     String cookie =
         SpService.to.getString(SpKeyConst.getCookieKey(Platform.QQ));
-    var uin = getCookieParam(cookie, "uin");
+    return getCookieParam(cookie, "uin");
+  }
+
+  @override
+  getUserInfo() async {
+    var uin = _getUin();
     print(uin);
     if (uin == null) {
       return null;
@@ -336,7 +338,7 @@ class QQ extends AbstractProvider {
       "authority": "u.y.qq.com",
       "user-agent":
           "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
-      "cookie": cookie
+      "cookie": SpService.to.getString(SpKeyConst.getCookieKey(Platform.QQ))
     };
     var cDio = Dio(copyOptions);
     var resp = await cDio.get(targetUrl);
@@ -349,14 +351,123 @@ class QQ extends AbstractProvider {
   }
 
   @override
-  getUserPlayList() {
-    // TODO: implement getUserPlayList
-    throw UnimplementedError();
+  getUserPlayList() async {
+    var uin = _getUin();
+    if (uin == null) {
+      return null;
+    }
+    var targetUrl =
+        "https://c.y.qq.com/rsc/fcgi-bin/fcg_user_created_diss?cv=4747474&ct=24&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=1&uin=$uin&hostuin=$uin&sin=0&size=100";
+    var resp = await Dio(dio.options.copyWith(responseType: ResponseType.plain))
+        .get(targetUrl);
+
+    var data = jsonDecode(resp.data);
+    var list = <Playlist>[];
+    data["data"]["disslist"].forEach((item) {
+      if (item["dir_show"] == 0) {
+        if (item["tid"] != 0) {
+          if (item["diss_name"] == '我喜欢') {
+            var playlist = Playlist(
+                "https://y.gtimg.cn/mediastyle/y/img/cover_love_300.jpg",
+                item["diss_name"],
+                "qqplaylist_${item['tid']}",
+                "https://y.qq.com/n/ryqq/playlist/${item['tid']}",
+                Platform.QQ);
+            playlist.isSub = false;
+            list.add(playlist);
+          }
+        }
+      } else {
+        var playlist = Playlist(
+            item["diss_cover"],
+            item["diss_name"],
+            "qqplaylist_${item['tid']}",
+            "https://y.qq.com/n/ryqq/playlist/${item['tid']}",
+            Platform.QQ);
+        playlist.isSub = false;
+        list.add(playlist);
+      }
+    });
+    targetUrl =
+        "https://c.y.qq.com/fav/fcgi-bin/fcg_get_profile_order_asset.fcg";
+    var req = {
+      "ct": 20,
+      "cid": 205360956,
+      "userid": uin,
+      "reqtype": 3,
+      "sin": 0,
+      "ein": 100,
+    };
+    resp = await dio.get(targetUrl, queryParameters: req);
+    data = resp.data;
+    data["data"]["cdlist"].forEach((item) {
+      if (item["dir_show"] != 0) {
+        var playlist = Playlist(
+            item["logo"],
+            item["dissname"],
+            "qqplaylist_${item['dissid']}",
+            "https://y.qq.com/n/ryqq/playlist/${item['dissid']}",
+            Platform.QQ);
+        playlist.isSub = true;
+        list.add(playlist);
+      }
+    });
+    return list;
   }
 
   @override
-  getUserRecommand() {
-    // TODO: implement getUserRecommand
-    throw UnimplementedError();
+  getUserRecommand() async {
+    var uin = _getUin();
+    print(uin);
+    if (uin == null) {
+      return null;
+    }
+    var targetUrl =
+        "https://c.y.qq.com/v8/fcg-bin/fcg_v8_playlist_cp.fcg?cv=10000&ct=19&newsong=1&tpl=wk&id=4679399604&g_tk=864756762&platform=mac&g_tk_new_20200303=864756762&loginUin=$uin&hostUin=0&format=json&inCharset=GB2312&outCharset=utf-8&notice=0&platform=jqspaframe.json&needNewCode=0";
+    var resp = await dio.get(targetUrl);
+    var data = jsonDecode(resp.data);
+    var list = <Song>[];
+    data["data"]["cdlist"][0]["songlist"].forEach((song) {
+      list.add(Song(
+          "qqtrack_${song['mid']}",
+          "${htmlParse(song['name'])}",
+          "${htmlParse(song['singer'][0]['name'])}",
+          "qqartist_${song['singer'][0]['mid']}",
+          "${htmlParse(song['album']['name'])}",
+          "qqalbum_${song['album']['mid']}",
+          "https://y.qq.com/#type=song&mid=${song['mid']}&tpl=yqq_song_detail",
+          Platform.QQ,
+          qq_get_image_url(song["album"]['mid'], 'album'),
+          song["interval"] * 1000,
+          "",
+          false));
+    });
+    return list;
+  }
+
+  _recommandPlaylist() async {
+    var p = Uri.encodeComponent(jsonEncode({
+      "comm": {
+        "ct": 24,
+      },
+      "recomPlaylist": {
+        "method": 'get_hot_recommend',
+        "param": {
+          "async": 1,
+          "cmd": 2,
+        },
+        "module": 'playlist.HotRecommendServer',
+      },
+    }));
+    var targetUrl =
+        "https://u.y.qq.com/cgi-bin/musicu.fcg?format=json&&loginUin=0&hostUin=0inCharset=utf8&outCharset=utf-8&platform=yqq.json&needNewCode=0&data=$p";
+    var resp = await dio.get(targetUrl);
+    var data = resp.data["recomPlaylist"]["data"];
+    var list = <Playlist>[];
+    data['v_hot'].forEach((e) {
+      list.add(Playlist(e['cover'], e["title"], "qqplaylist_${e['content_id']}",
+          "https://y.qq.com/n/ryqq/playlist/${e['content_id']}", Platform.QQ));
+    });
+    return list;
   }
 }
