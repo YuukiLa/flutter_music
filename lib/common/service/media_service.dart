@@ -75,6 +75,11 @@ class MediaController extends GetxController {
     return song;
   }
 
+  Future<bool> createLocalPlaylist(String name) async {
+
+    return true;
+  }
+
   Future<PlaylistFilter> getFilter(String source) async {
     return await providers[source]!.playlistFilter();
   }

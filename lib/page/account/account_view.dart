@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/model/user.dart';
@@ -28,9 +29,96 @@ class AccountPage extends GetView<AccountLogic> {
               height: 40,
             ),
             _accountWidget(context, Platform.QQ),
+            const SizedBox(
+              height: 20,
+            ),
+            Container(
+              padding: const EdgeInsets.only(left: 20,right: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("本地歌单",style: TextStyle(fontWeight: FontWeight.w500),),
+                  IconButton(onPressed: () {
+                    _showDialog(context);
+                  }, icon: const Icon(Icons.add))
+                ],
+              ),
+            ),
+            _localPlaylist(context)
           ],
         ));
     // });
+  }
+
+  _showDialog(BuildContext context) {
+    showAnimatedDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text("创建歌单"),
+          contentPadding: EdgeInsets.only(left: 25),
+          children: [
+            Container(
+              child: TextField(
+                controller: controller.textEditingController,
+                onChanged: controller.onTextChange,
+                cursorColor: Theme.of(context).primaryColor,
+                autofocus: true,
+                // keyboardType: TextInputType.text,
+                style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300),
+                decoration: const InputDecoration(
+                    contentPadding:
+                    EdgeInsets.only(bottom: 10),
+                    border: InputBorder.none,
+                    hintText: "歌单名"),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(onPressed: () {
+                  Navigator.pop(context);
+                }, child: Text("取消",style: TextStyle(color: Colors.black45),)),
+                TextButton(onPressed: () {
+
+                }, child: Text("确定",style: TextStyle(color: Theme.of(context).primaryColor),))
+              ],
+            )
+          ],
+        );
+      },
+      animationType: DialogTransitionType.size,
+      curve: Curves.bounceInOut,
+      duration: Duration(seconds: 1),
+    );
+  }
+
+  Widget _localPlaylist(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 10,
+            spreadRadius: 1,
+            color: Colors.black12,
+          )
+        ],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+
+        ],
+      ),
+    );
   }
 
   Widget _accountWidget(BuildContext context, String source) {

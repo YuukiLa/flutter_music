@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/enums/sp_key.dart';
@@ -13,8 +14,12 @@ import 'account_state.dart';
 class AccountLogic extends GetxController {
   final AccountState state = AccountState();
 
+  late TextEditingController textEditingController;
+
   @override
   onInit() {
+    textEditingController = TextEditingController();
+
     var qqUserStr = SpService.to.getString(SpKeyConst.getUserKey(Platform.QQ));
     var neteaseUserStr =
         SpService.to.getString(SpKeyConst.getUserKey(Platform.Netease));
@@ -26,6 +31,10 @@ class AccountLogic extends GetxController {
     }
     // refreshUserInfo();
     super.onInit();
+  }
+
+  onTextChange(String text) {
+    state.playlistName.value = text;
   }
 
   goto(String platform) {
