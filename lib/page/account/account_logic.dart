@@ -8,6 +8,8 @@ import 'package:unknown/common/model/user.dart';
 import 'package:unknown/common/route/app_routes.dart';
 import 'package:unknown/common/service/media_service.dart';
 import 'package:unknown/common/service/sp_service.dart';
+import 'package:unknown/common/service/storage.dart';
+import 'package:unknown/common/utils/dialog.dart';
 
 import 'account_state.dart';
 
@@ -19,7 +21,7 @@ class AccountLogic extends GetxController {
   @override
   onInit() {
     textEditingController = TextEditingController();
-
+    getLocalPlayList();
     var qqUserStr = SpService.to.getString(SpKeyConst.getUserKey(Platform.QQ));
     var neteaseUserStr =
         SpService.to.getString(SpKeyConst.getUserKey(Platform.Netease));
@@ -63,5 +65,20 @@ class AccountLogic extends GetxController {
 
   gotoPlaylist(String platform) async {
     Get.toNamed(AppRoutes.USER_PLAYLIST,arguments: {"platform": platform});
+  }
+
+  void createPlaylist(BuildContext context) async{
+    await MediaController.to.createLocalPlaylist(state.playlistName.value);
+    state.playlistName.value="";
+    Navigator.pop(context);
+    DialogUtil.toast("创建成功");
+    getLocalPlayList();
+  }
+
+  getLocalPlayList() async{
+    var list = await StorageService.to.getPlaylists();
+    state.localPlaylist.clear();
+    state.localPlaylist.addAll(list);
+    print(list.length);
   }
 }

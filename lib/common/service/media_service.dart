@@ -10,6 +10,8 @@ import 'package:unknown/common/provider/netease.dart';
 import 'package:unknown/common/provider/qq.dart';
 import 'package:unknown/common/service/player_service.dart';
 import 'package:unknown/common/service/storage.dart';
+import 'package:uuid/uuid.dart';
+import 'package:uuid/uuid_util.dart';
 
 import '../model/song.dart';
 
@@ -76,7 +78,8 @@ class MediaController extends GetxController {
   }
 
   Future<bool> createLocalPlaylist(String name) async {
-
+    var playlist = Playlist("",name,const Uuid().v4(),"",Platform.LOCAL);
+    await StorageService.to.savePlaylist(playlist);
     return true;
   }
 

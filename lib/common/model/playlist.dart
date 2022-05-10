@@ -9,8 +9,8 @@ class Playlist {
   late String id;
   late String sourceUrl;
   late String source;
-  late bool isSub;
-  late int count;
+  late bool isSub=false;
+  late int count=0;
 
   Playlist(this.coverImgUrl, this.title, this.id, this.sourceUrl, this.source);
 

@@ -19,7 +19,7 @@ class AccountPage extends GetView<AccountLogic> {
           backgroundColor: Theme.of(context).primaryColor,
           child: const Icon(Icons.refresh),
         ),
-        body: ListView(
+        body: Column(
           children: [
             const SizedBox(
               height: 30,
@@ -33,18 +33,25 @@ class AccountPage extends GetView<AccountLogic> {
               height: 20,
             ),
             Container(
-              padding: const EdgeInsets.only(left: 20,right: 10),
+              padding: const EdgeInsets.only(left: 20, right: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("本地歌单",style: TextStyle(fontWeight: FontWeight.w500),),
-                  IconButton(onPressed: () {
-                    _showDialog(context);
-                  }, icon: const Icon(Icons.add))
+                  const Text(
+                    "本地歌单",
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        _showDialog(context);
+                      },
+                      icon: const Icon(Icons.add))
                 ],
               ),
             ),
-            _localPlaylist(context)
+            Expanded(
+              child: _localPlaylist(context),
+            )
           ],
         ));
     // });
@@ -71,8 +78,7 @@ class AccountPage extends GetView<AccountLogic> {
                     color: Colors.black,
                     fontWeight: FontWeight.w300),
                 decoration: const InputDecoration(
-                    contentPadding:
-                    EdgeInsets.only(bottom: 10),
+                    contentPadding: EdgeInsets.only(bottom: 10),
                     border: InputBorder.none,
                     hintText: "歌单名"),
               ),
@@ -80,12 +86,22 @@ class AccountPage extends GetView<AccountLogic> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: () {
-                  Navigator.pop(context);
-                }, child: Text("取消",style: TextStyle(color: Colors.black45),)),
-                TextButton(onPressed: () {
-
-                }, child: Text("确定",style: TextStyle(color: Theme.of(context).primaryColor),))
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "取消",
+                      style: TextStyle(color: Colors.black45),
+                    )),
+                TextButton(
+                    onPressed: () {
+                      controller.createPlaylist(context);
+                    },
+                    child: Text(
+                      "确定",
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ))
               ],
             )
           ],
@@ -98,27 +114,69 @@ class AccountPage extends GetView<AccountLogic> {
   }
 
   Widget _localPlaylist(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 10,
-            spreadRadius: 1,
-            color: Colors.black12,
-          )
-        ],
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-
-        ],
-      ),
-    );
+    return Obx(() {
+      return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                blurRadius: 10,
+                spreadRadius: 1,
+                color: Colors.black12,
+              )
+            ],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: ListView.builder(
+            itemBuilder: (BuildContext listContext, int index) {
+              var playlist = controller.state.localPlaylist[index];
+              return InkWell(
+                child: Container(
+                  height: 90,
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  child: Row(
+                    children: [
+                      Card(
+                        elevation: 0,
+                        color: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusDirectional.circular(8)),
+                        clipBehavior: Clip.antiAlias,
+                        child: Image.asset(
+                          "images/common/local_img.png",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 7,
+                      ),
+                      Expanded(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            playlist.title,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              overflow: TextOverflow.ellipsis,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ],
+                      )),
+                      const Icon(Icons.more_vert_sharp)
+                    ],
+                  ),
+                ),
+              );
+            },
+            itemCount: controller.state.localPlaylist.length,
+          ));
+    });
   }
 
   Widget _accountWidget(BuildContext context, String source) {

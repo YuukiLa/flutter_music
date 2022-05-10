@@ -12,7 +12,7 @@ Playlist _$PlaylistFromJson(Map<String, dynamic> json) => Playlist(
       json['id'] as String,
       json['sourceUrl'] as String,
       json['source'] as String,
-    )..isSub = json['isSub'] as bool..count=json['count'] as int;
+    )..isSub = json['isSub']??false as bool..count=json['count']??0 as int;
 
 Map<String, dynamic> _$PlaylistToJson(Playlist instance) => <String, dynamic>{
       'coverImgUrl': instance.coverImgUrl,
