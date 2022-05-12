@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/widget/song_item.dart';
 
@@ -166,58 +167,59 @@ class SongListPage extends GetView<SongListLogic> {
   }
 
   Widget _buildSongItem(BuildContext context, int index) {
-    return InkWell(
-        onTap: () => controller.onSongClick(index),
-        child: SongItem(song: controller.state.songs[index])
-        // Container(
-        //   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-        //   height: 70,
-        //   child: Row(
-        //     children: [
-        //       Card(
-        //         elevation: 0,
-        //         color: Colors.transparent,
-        //         shape: RoundedRectangleBorder(
-        //             borderRadius: BorderRadiusDirectional.circular(8)),
-        //         clipBehavior: Clip.antiAlias,
-        //         child: CachedNetworkImage(
-        //           fit: BoxFit.cover,
-        //           placeholder: (context, url) =>
-        //               const CircularProgressIndicator(),
-        //           errorWidget: (context, url, error) => const Icon(Icons.error),
-        //           imageUrl: controller.state.songs[index].imgUrl,
-        //         ),
-        //       ),
-        //       const SizedBox(
-        //         width: 7,
-        //       ),
-        //       Expanded(
-        //           child: Column(
-        //         crossAxisAlignment: CrossAxisAlignment.start,
-        //         children: [
-        //           Text(
-        //             controller.state.songs[index].title,
-        //             style: const TextStyle(
-        //               fontSize: 15,
-        //               overflow: TextOverflow.ellipsis,
-        //               fontWeight: FontWeight.w300,
-        //             ),
-        //           ),
-        //           Container(
-        //             margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-        //             child: Text(
-        //               controller.state.songs[index].artist,
-        //               style: const TextStyle(
-        //                 fontSize: 13,
-        //                 color: Colors.black45,
-        //               ),
-        //             ),
-        //           ),
-        //         ],
-        //       ))
-        //     ],
-        //   ),
-        // ),
+    return SongItem(
+      song: controller.state.songs[index],
+      tap: () => controller.onSongClick(index),
+      longTap: () {
+
+      },
+    );
+    // InkWell(
+    //     onTap: ,
+    //     child:
+    //     );
+  }
+  _showDialog(BuildContext context) {
+    showAnimatedDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text("创建歌单"),
+          contentPadding: EdgeInsets.only(left: 25),
+          children: [
+            Container(
+              child: Column(
+                children: [],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "取消",
+                      style: TextStyle(color: Colors.black45),
+                    )),
+                TextButton(
+                    onPressed: () {
+
+                    },
+                    child: Text(
+                      "确定",
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ))
+              ],
+            )
+          ],
         );
+      },
+      animationType: DialogTransitionType.size,
+      curve: Curves.bounceInOut,
+      duration: Duration(seconds: 1),
+    );
   }
 }

@@ -19,7 +19,7 @@ class AccountPage extends GetView<AccountLogic> {
           backgroundColor: Theme.of(context).primaryColor,
           child: const Icon(Icons.refresh),
         ),
-        body: Column(
+        body: ListView(
           children: [
             const SizedBox(
               height: 30,
@@ -49,9 +49,7 @@ class AccountPage extends GetView<AccountLogic> {
                 ],
               ),
             ),
-            Expanded(
-              child: _localPlaylist(context),
-            )
+            _localPlaylist(context),
           ],
         ));
     // });
@@ -117,7 +115,7 @@ class AccountPage extends GetView<AccountLogic> {
     return Obx(() {
       return Container(
           width: double.infinity,
-          margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
+          margin: const EdgeInsets.only(top: 5, left: 15, right: 15,bottom: 10),
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -130,52 +128,49 @@ class AccountPage extends GetView<AccountLogic> {
             ],
             borderRadius: BorderRadius.circular(10),
           ),
-          child: ListView.builder(
-            itemBuilder: (BuildContext listContext, int index) {
-              var playlist = controller.state.localPlaylist[index];
-              return InkWell(
-                child: Container(
-                  height: 90,
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: Row(
-                    children: [
-                      Card(
-                        elevation: 0,
-                        color: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadiusDirectional.circular(8)),
-                        clipBehavior: Clip.antiAlias,
-                        child: Image.asset(
-                          "images/common/local_img.png",
-                          fit: BoxFit.cover,
-                        ),
+          child: Column(
+              children: controller.state.localPlaylist.map((playlist) {
+            return InkWell(
+              child: Container(
+                height: 90,
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: Row(
+                  children: [
+                    Card(
+                      elevation: 0,
+                      color: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusDirectional.circular(8)),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset(
+                        "images/common/local_img.png",
+                        fit: BoxFit.cover,
                       ),
-                      const SizedBox(
-                        width: 7,
-                      ),
-                      Expanded(
-                          child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            playlist.title,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              overflow: TextOverflow.ellipsis,
-                              fontWeight: FontWeight.w300,
-                            ),
+                    ),
+                    const SizedBox(
+                      width: 7,
+                    ),
+                    Expanded(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          playlist.title,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            overflow: TextOverflow.ellipsis,
+                            fontWeight: FontWeight.w300,
                           ),
-                        ],
-                      )),
-                      const Icon(Icons.more_vert_sharp)
-                    ],
-                  ),
+                        ),
+                      ],
+                    )),
+                    const Icon(Icons.more_vert_sharp)
+                  ],
                 ),
-              );
-            },
-            itemCount: controller.state.localPlaylist.length,
-          ));
+              ),
+            );
+          }).toList()));
     });
   }
 
