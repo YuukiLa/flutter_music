@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:get/get.dart';
+import 'package:unknown/common/utils/dialog.dart';
 import 'package:unknown/common/widget/song_item.dart';
 
 import 'song_list_logic.dart';
@@ -42,53 +43,62 @@ class SongListPage extends GetView<SongListLogic> {
                         child: Card(
                           shape: const RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(45))),
+                              BorderRadius.all(Radius.circular(45))),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Expanded(
                                   child: GestureDetector(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.collections_bookmark,
-                                      size: 15,
-                                      color: Theme.of(context).primaryColor,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .center,
+                                      children: [
+                                        Icon(
+                                          Icons.collections_bookmark,
+                                          size: 15,
+                                          color: Theme
+                                              .of(context)
+                                              .primaryColor,
+                                        ),
+                                        Text("收藏")
+                                      ],
                                     ),
-                                    Text("收藏")
-                                  ],
-                                ),
-                              )),
+                                  )),
                               Expanded(
                                   child: GestureDetector(
                                     onTap: controller.playAll,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.play_arrow_sharp,
-                                      size: 15,
-                                      color: Theme.of(context).primaryColor,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .center,
+                                      children: [
+                                        Icon(
+                                          Icons.play_arrow_sharp,
+                                          size: 15,
+                                          color: Theme
+                                              .of(context)
+                                              .primaryColor,
+                                        ),
+                                        Text("播放全部")
+                                      ],
                                     ),
-                                    Text("播放全部")
-                                  ],
-                                ),
-                              )),
+                                  )),
                               Expanded(
                                   child: GestureDetector(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.chair,
-                                      size: 15,
-                                      color: Theme.of(context).primaryColor,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .center,
+                                      children: [
+                                        Icon(
+                                          Icons.chair,
+                                          size: 15,
+                                          color: Theme
+                                              .of(context)
+                                              .primaryColor,
+                                        ),
+                                        Text("选择")
+                                      ],
                                     ),
-                                    Text("选择")
-                                  ],
-                                ),
-                              )),
+                                  )),
                             ],
                           ),
                         ),
@@ -137,25 +147,25 @@ class SongListPage extends GetView<SongListLogic> {
                       children: [
                         Expanded(
                             child: ListView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          children: [
-                            Container(
-                              height: 400,
-                              child: Obx(() {
-                                if (controller.state.image.value == "") {
-                                  return const SizedBox(
-                                    height: 400,
-                                  );
-                                }
-                                return Image.network(
-                                  controller.state.image.value,
-                                  fit: BoxFit.cover,
-                                );
-                              }),
-                            )
-                          ],
-                        )),
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              children: [
+                                Container(
+                                  height: 400,
+                                  child: Obx(() {
+                                    if (controller.state.image.value == "") {
+                                      return const SizedBox(
+                                        height: 400,
+                                      );
+                                    }
+                                    return Image.network(
+                                      controller.state.image.value,
+                                      fit: BoxFit.cover,
+                                    );
+                                  }),
+                                )
+                              ],
+                            )),
                       ],
                     ),
                   )
@@ -169,9 +179,12 @@ class SongListPage extends GetView<SongListLogic> {
   Widget _buildSongItem(BuildContext context, int index) {
     return SongItem(
       song: controller.state.songs[index],
+      isLocal: controller.type==2,
       tap: () => controller.onSongClick(index),
       longTap: () {
-
+        DialogUtil.showCollectPlaylist(context, (id) {
+          controller.collectToPlaylist(index,id);
+        });
       },
     );
     // InkWell(
@@ -179,47 +192,5 @@ class SongListPage extends GetView<SongListLogic> {
     //     child:
     //     );
   }
-  _showDialog(BuildContext context) {
-    showAnimatedDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: Text("创建歌单"),
-          contentPadding: EdgeInsets.only(left: 25),
-          children: [
-            Container(
-              child: Column(
-                children: [],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      "取消",
-                      style: TextStyle(color: Colors.black45),
-                    )),
-                TextButton(
-                    onPressed: () {
 
-                    },
-                    child: Text(
-                      "确定",
-                      style: TextStyle(color: Theme.of(context).primaryColor),
-                    ))
-              ],
-            )
-          ],
-        );
-      },
-      animationType: DialogTransitionType.size,
-      curve: Curves.bounceInOut,
-      duration: Duration(seconds: 1),
-    );
-  }
 }

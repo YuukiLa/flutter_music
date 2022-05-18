@@ -7,9 +7,10 @@ import '../model/song.dart';
 
 class SongItem extends StatelessWidget {
   late Song song;
+  bool? isLocal = false;
   late VoidCallback? tap;
   late VoidCallback? longTap;
-  SongItem({Key? key, required this.song,this.tap,this.longTap}) : super(key: key);
+  SongItem({Key? key, required this.song,this.tap,this.longTap,this.isLocal}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,7 @@ class SongItem extends StatelessWidget {
       },
       onLongPressStart: (LongPressStartDetails details) {
         print("long press");
-        DialogUtil.showPopupMenu(context, details.globalPosition.dx, details.globalPosition.dy, ["收藏到歌单"], (value) {
+        DialogUtil.showPopupMenu(context, details.globalPosition.dx, details.globalPosition.dy, isLocal! ?["移除歌单"]: ["收藏到歌单"], (value) {
           if(longTap!=null && value!=null) {
             longTap!();
           }
@@ -30,8 +31,9 @@ class SongItem extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-        width: double.maxFinite,
+        width: double.infinity,
         height: 70,
+        color: Colors.transparent,
         child: Row(
           children: [
             Card(

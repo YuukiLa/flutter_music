@@ -12,7 +12,7 @@ class SongListLogic extends GetxController {
   final SongListState state = SongListState();
   late dynamic info;
   late String platform;
-  late bool isRecommand;
+  late int type;
 
   getSongList() async {
     DialogUtil.showLoading();
@@ -33,16 +33,28 @@ class SongListLogic extends GetxController {
     state.songs.addAll(res!);
     DialogUtil.dismiss();
   }
+  getLocal() async{
+    var res = await MediaController.to.getLocalPlaylistSongs(state.id.value);
+    state.image.value = "https://s1.ax1x.com/2022/05/06/Ouajdf.jpg";
+    state.songs.addAll(res);
+  }
 
   @override
   void onInit() {
-    isRecommand = Get.arguments["recommand"] ?? false;
+    type = Get.arguments["type"] ?? 0;
     state.id.value = Get.arguments["id"] ?? "";
-    platform = Get.arguments["platform"];
-    if (isRecommand) {
-      getRecommand();
-    } else {
-      getSongList();
+    state.title.value = Get.arguments["title"] ?? "";
+    platform = Get.arguments["platform"] ?? "";
+    switch(type) {
+      case 0:
+        getSongList();
+        break;
+      case 1:
+        getRecommand();
+        break;
+      case 2:
+        getLocal();
+        break;
     }
     super.onInit();
   }
@@ -66,5 +78,13 @@ class SongListLogic extends GetxController {
     //TODO change to use playerservice
     await MediaController.to.play(state.songs[index]);
     print(index);
+  }
+
+  void collectToPlaylist(int index, String id) async{
+    if(await MediaController.to.saveToLocalPlaylist(state.songs[index], id)) {
+      DialogUtil.toast("已收藏");
+    }else {
+      DialogUtil.toast("已存在该歌单中");
+    }
   }
 }

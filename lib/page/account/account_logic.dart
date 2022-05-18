@@ -45,7 +45,7 @@ class AccountLogic extends GetxController {
 
   gotoRecommand(String platform) {
     Get.toNamed(AppRoutes.SONG_LIST,
-        arguments: {"platform": platform, "recommand": true});
+        arguments: {"platform": platform, "type": 1});
   }
 
   refreshUserInfo() async {
@@ -65,6 +65,10 @@ class AccountLogic extends GetxController {
 
   gotoPlaylist(String platform) async {
     Get.toNamed(AppRoutes.USER_PLAYLIST,arguments: {"platform": platform});
+  }
+
+  gotoLocalPlaylist(String playlistId,String title) async {
+    Get.toNamed(AppRoutes.SONG_LIST,arguments: {"type":2,"id":playlistId,"title": title});
   }
 
   void createPlaylist(BuildContext context) async{

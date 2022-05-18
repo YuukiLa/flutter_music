@@ -10,8 +10,12 @@ class StorageService extends GetxService {
   static StorageService get to => Get.find();
   late Database _db;
   late StoreRef _store;
+  //本地歌单
   late Database _playlistDb;
   late StoreRef _playlistStore;
+  //本地歌曲列表，关联歌单
+  late Database _songsDb;
+  late StoreRef _songsStore;
 
   Future<StorageService> init() async {
     var dir = await getApplicationDocumentsDirectory();
@@ -21,6 +25,8 @@ class StorageService extends GetxService {
     _store = intMapStoreFactory.store("song");
     _playlistDb = await databaseFactoryIo.openDatabase(join(dir.path, "playlist.db"));
     _playlistStore = intMapStoreFactory.store("playlist");
+    _songsDb = await databaseFactoryIo.openDatabase(join(dir.path, "songs.db"));
+    _songsStore = intMapStoreFactory.store("songs");
     return this;
   }
 
@@ -33,6 +39,23 @@ class StorageService extends GetxService {
 
     return list.map((e) => Playlist.fromJson(e.value)).toList();
   }
+
+  saveToPlayList(Song song,String id) {
+    song.albumId = id;
+    _songsStore.add(_songsDb, song.toJson());
+  }
+
+  Future<bool> checkExistSongInPlayList(String songId,String playlistId) async {
+    var record = await _songsStore.findFirst(_songsDb,
+        finder: Finder(filter: Filter.equals("id", songId) & Filter.equals("albumId", playlistId)));
+    return record!=null;
+  }
+
+  Future<List<Song>> getPlaylistSongs(String playlistId) async{
+    var record = await _songsStore.find(_songsDb,finder: Finder(filter: Filter.equals("albumId", playlistId)));
+    return record.map((e) => Song.fromJson(e.value)).toList();
+  }
+
 
   saveSong(Song song) async {
     _store.add(_db, song.toJson());

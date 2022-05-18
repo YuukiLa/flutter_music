@@ -4,6 +4,7 @@ import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/enums/platform.dart';
 import 'package:unknown/common/model/user.dart';
+import 'package:unknown/common/utils/dialog.dart';
 
 import 'account_logic.dart';
 
@@ -131,6 +132,9 @@ class AccountPage extends GetView<AccountLogic> {
           child: Column(
               children: controller.state.localPlaylist.map((playlist) {
             return InkWell(
+              onTap: () {
+                controller.gotoLocalPlaylist(playlist.id, playlist.title);
+              },
               child: Container(
                 height: 90,
                 padding: const EdgeInsets.only(left: 10, right: 10),
@@ -145,6 +149,8 @@ class AccountPage extends GetView<AccountLogic> {
                       child: Image.asset(
                         "images/common/local_img.png",
                         fit: BoxFit.cover,
+                        width: 60,
+                        height: 60,
                       ),
                     ),
                     const SizedBox(
@@ -165,7 +171,14 @@ class AccountPage extends GetView<AccountLogic> {
                         ),
                       ],
                     )),
-                    const Icon(Icons.more_vert_sharp)
+                    GestureDetector(
+                        onTapDown: (TapDownDetails detail) {
+                          DialogUtil.showPopupMenu(context, detail.globalPosition.dx, detail.globalPosition.dy, ["删除歌单"], (int index) {
+
+                          });
+                        },
+                        child:  Icon(Icons.more_vert_sharp)
+                    )
                   ],
                 ),
               ),

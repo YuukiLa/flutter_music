@@ -83,6 +83,21 @@ class MediaController extends GetxController {
     return true;
   }
 
+  Future<bool> saveToLocalPlaylist(Song song,String id) async {
+    print(song.id+":"+id);
+    var isExist = await StorageService.to.checkExistSongInPlayList(song.id, id);
+    if(isExist) {
+      return false;
+    }
+    song.url="";
+    StorageService.to.saveToPlayList(song, id);
+    return true;
+  }
+  Future<List<Song>> getLocalPlaylistSongs(String playlistId) async{
+    return await StorageService.to.getPlaylistSongs(playlistId);
+  }
+
+
   Future<PlaylistFilter> getFilter(String source) async {
     return await providers[source]!.playlistFilter();
   }
