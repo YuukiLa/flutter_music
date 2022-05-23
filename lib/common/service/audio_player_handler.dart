@@ -293,11 +293,19 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
   Future<void> addSong(Song song) async {
     if (_songlist.isNotEmpty) {
       // 判断当前歌曲的位置是否是处于最后一位
-      _songlist.insert(_curIndex + 1, song);
-      final newQueue = queue.value
-        ..insert(_curIndex + 1, _song2MediaItem(song));
-      _curIndex++;
-      queue.add(newQueue);
+      if (_curIndex == _songlist.length - 1) {
+        _songlist.add(song);
+        final newQueue = queue.value..add(_song2MediaItem(song));
+        _curIndex++;
+        queue.add(newQueue);
+      } else {
+        _songlist.insert(_curIndex + 1, song);
+        print(_curIndex);
+        final newQueue = queue.value
+          ..insert(_curIndex + 1, _song2MediaItem(song));
+        _curIndex++;
+        queue.add(newQueue);
+      }
     } else {
       _songlist.insert(_curIndex, song);
       final newQueue = queue.value..insert(_curIndex, _song2MediaItem(song));

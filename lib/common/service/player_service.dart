@@ -32,11 +32,9 @@ class PlayerService extends GetxService {
     );
     _listenToPlaybackState();
     _listenSongChange();
-    currSong = _audioHandler.songList.isNotEmpty
-        ? _audioHandler.currPlaying.obs
-        : Song("", "无播放源", "", "", "", "", "", "", "images/common/music.png", 0,
-                "", true)
-            .obs;
+    if (_audioHandler.songList.isNotEmpty) {
+      currSong.value = _audioHandler.currPlaying;
+    }
     return this;
   }
 
@@ -70,7 +68,7 @@ class PlayerService extends GetxService {
   play(Song song) async {
     print(song.url);
     await _audioHandler.addSong(song);
-    _audioHandler.playIndex(_audioHandler.songsLen - 1);
+    _audioHandler.playIndex(_audioHandler.curIndex);
     // _audioHandler.play();
   }
 
