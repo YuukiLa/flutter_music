@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:unknown/common/route/app_routes.dart';
+import 'package:unknown/common/service/player_service.dart';
+import 'package:unknown/page/account/account_index.dart';
 
 import 'main_state.dart';
 
@@ -32,7 +34,9 @@ class MainLogic extends GetxController {
   onHorizontalDragEnd(DragEndDetails details) {
     if (_initialSwipeOffset != null) {
       final offsetDifference = _initialSwipeOffset.dx - _finalSwipeOffset.dx;
-      final direction = offsetDifference > 0 ? print('left') : print('right');
+      offsetDifference > 0
+          ? PlayerService.instance.next()
+          : PlayerService.instance.previous();
     }
   }
 
@@ -47,5 +51,9 @@ class MainLogic extends GetxController {
   void onBottomTap(int value) {
     state.currPage = value;
     pageController.jumpToPage(value);
+    if (value == 1) {
+      AccountLogic logic = Get.find();
+      logic.getLocalPlayList();
+    }
   }
 }

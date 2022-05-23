@@ -116,7 +116,8 @@ class AccountPage extends GetView<AccountLogic> {
     return Obx(() {
       return Container(
           width: double.infinity,
-          margin: const EdgeInsets.only(top: 5, left: 15, right: 15,bottom: 10),
+          margin:
+              const EdgeInsets.only(top: 5, left: 15, right: 15, bottom: 10),
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -173,12 +174,15 @@ class AccountPage extends GetView<AccountLogic> {
                     )),
                     GestureDetector(
                         onTapDown: (TapDownDetails detail) {
-                          DialogUtil.showPopupMenu(context, detail.globalPosition.dx, detail.globalPosition.dy, ["删除歌单"], (int index) {
-
+                          DialogUtil.showPopupMenu(
+                              context,
+                              detail.globalPosition.dx,
+                              detail.globalPosition.dy,
+                              ["删除歌单"], (int index) {
+                            controller.removeLocalPlaylist(playlist.id);
                           });
                         },
-                        child:  Icon(Icons.more_vert_sharp)
-                    )
+                        child: const Icon(Icons.more_vert_sharp))
                   ],
                 ),
               ),

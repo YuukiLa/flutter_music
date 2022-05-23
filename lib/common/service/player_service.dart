@@ -13,8 +13,9 @@ class PlayerService extends GetxService {
   late UnknownAudioPlayerHandler _audioHandler;
   Rx<PlayState> playState = PlayState.STOP.obs;
   Rx<PlayMode> playMode = PlayMode.SEQUENCE.obs;
-  Rx<Song> currSong = Song(
-      "", "无播放源", "", "", "", "", "", "", "images/common/music.png", 0, "", true).obs;
+  Rx<Song> currSong = Song("", "无播放源", "", "", "", "", "", "",
+          "images/common/music.png", 0, "", true)
+      .obs;
   UnknownAudioPlayerHandler get audioHandler => _audioHandler;
 
   Future<PlayerService> init() async {
@@ -31,14 +32,20 @@ class PlayerService extends GetxService {
     );
     _listenToPlaybackState();
     _listenSongChange();
+    currSong = _audioHandler.songList.isNotEmpty
+        ? _audioHandler.currPlaying.obs
+        : Song("", "无播放源", "", "", "", "", "", "", "images/common/music.png", 0,
+                "", true)
+            .obs;
     return this;
   }
 
   void _listenSongChange() {
     _audioHandler.setSongChangeListener((Song song) {
-      currSong.value=song;
+      currSong.value = song;
     });
   }
+
   //监听播放状态
   void _listenToPlaybackState() {
     _audioHandler.playbackState.listen((playbackState) {
@@ -70,6 +77,7 @@ class PlayerService extends GetxService {
   playSongs(List<Song> songs) {
     _audioHandler.changeQueueLists(songs);
   }
+
   playIndex(int index) {
     _audioHandler.playIndex(index);
   }
@@ -95,17 +103,17 @@ class PlayerService extends GetxService {
   }
 
   changePlayMode() {
-    switch(playMode.value) {
+    switch (playMode.value) {
       case PlayMode.SEQUENCE:
-        playMode.value=PlayMode.RANDOM;
+        playMode.value = PlayMode.RANDOM;
         _audioHandler.setPlayMode(PlayMode.RANDOM);
         break;
       case PlayMode.RANDOM:
-        playMode.value=PlayMode.SINGLE;
+        playMode.value = PlayMode.SINGLE;
         _audioHandler.setPlayMode(PlayMode.SINGLE);
         break;
       case PlayMode.SINGLE:
-        playMode.value=PlayMode.SEQUENCE;
+        playMode.value = PlayMode.SEQUENCE;
         _audioHandler.setPlayMode(PlayMode.SEQUENCE);
         break;
     }

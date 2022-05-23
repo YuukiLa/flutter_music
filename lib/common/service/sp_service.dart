@@ -10,18 +10,20 @@ class SpService extends GetxService {
     return this;
   }
 
-  Future<bool> setCookie(String source,String cookie) async{
+  Future<bool> setCookie(String source, String cookie) async {
     return await _prefs.setString("${source}_cookie", cookie);
   }
 
-  Future<bool> removeCookie(String source) async{
+  Future<bool> removeCookie(String source) async {
     return await _prefs.remove("${source}_cookie");
   }
 
-
-
   Future<bool> setString(String key, String value) async {
     return await _prefs.setString(key, value);
+  }
+
+  Future<bool> setInt(String key, int value) async {
+    return await _prefs.setInt(key, value);
   }
 
   Future<bool> setBool(String key, bool value) async {
@@ -34,6 +36,10 @@ class SpService extends GetxService {
 
   String getString(String key) {
     return _prefs.getString(key) ?? '';
+  }
+
+  int getInt(String key) {
+    return _prefs.getInt(key) ?? 0;
   }
 
   bool getBool(String key) {

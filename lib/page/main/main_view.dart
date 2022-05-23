@@ -6,7 +6,6 @@ import 'package:unknown/common/service/player_service.dart';
 import 'package:unknown/common/widget/keep_alive_wrapper.dart';
 import 'package:unknown/page/account/account_index.dart';
 import 'package:unknown/page/play_list/play_list_index.dart';
-import 'package:unknown/page/player/player_index.dart';
 
 import 'main_logic.dart';
 
@@ -16,7 +15,7 @@ class MainPage extends GetView<MainLogic> {
     return Obx(() {
       return Scaffold(
         appBar: AppBar(
-          title: const Text("Unknown"),
+          title: const Text("unknown"),
           centerTitle: true,
           actions: [
             IconButton(
@@ -32,23 +31,22 @@ class MainPage extends GetView<MainLogic> {
           onHorizontalDragEnd: controller.onHorizontalDragEnd,
           child: Container(
             decoration: BoxDecoration(
-                border: Border.all(color: Colors.yellow[800]!,width: 1),
-                borderRadius: BorderRadius.circular(65)
-            ),
+                border: Border.all(color: Colors.yellow[800]!, width: 1),
+                borderRadius: BorderRadius.circular(65)),
             child: ClipOval(
               child: PlayerService.instance.currSong.value.id == ""
                   ? Image.asset(
-                PlayerService.instance.currSong.value.imgUrl,
-                width: 65,
-                height: 65,
-                fit: BoxFit.cover,
-              )
+                      PlayerService.instance.currSong.value.imgUrl,
+                      width: 65,
+                      height: 65,
+                      fit: BoxFit.cover,
+                    )
                   : Image.network(
-                PlayerService.instance.currSong.value.imgUrl,
-                width: 65,
-                height: 65,
-                fit: BoxFit.cover,
-              ),
+                      PlayerService.instance.currSong.value.imgUrl,
+                      width: 65,
+                      height: 65,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
         ),

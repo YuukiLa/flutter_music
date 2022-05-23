@@ -64,25 +64,31 @@ class AccountLogic extends GetxController {
   }
 
   gotoPlaylist(String platform) async {
-    Get.toNamed(AppRoutes.USER_PLAYLIST,arguments: {"platform": platform});
+    Get.toNamed(AppRoutes.USER_PLAYLIST, arguments: {"platform": platform});
   }
 
-  gotoLocalPlaylist(String playlistId,String title) async {
-    Get.toNamed(AppRoutes.SONG_LIST,arguments: {"type":2,"id":playlistId,"title": title});
+  gotoLocalPlaylist(String playlistId, String title) async {
+    Get.toNamed(AppRoutes.SONG_LIST,
+        arguments: {"type": 2, "id": playlistId, "title": title});
   }
 
-  void createPlaylist(BuildContext context) async{
+  void createPlaylist(BuildContext context) async {
     await MediaController.to.createLocalPlaylist(state.playlistName.value);
-    state.playlistName.value="";
+    state.playlistName.value = "";
     Navigator.pop(context);
     DialogUtil.toast("创建成功");
     getLocalPlayList();
   }
 
-  getLocalPlayList() async{
+  getLocalPlayList() async {
     var list = await StorageService.to.getPlaylists();
     state.localPlaylist.clear();
     state.localPlaylist.addAll(list);
-    print(list.length);
+  }
+
+  removeLocalPlaylist(String id) async {
+    await MediaController.to.deleteLocalPlaylist(id);
+    getLocalPlayList();
+    DialogUtil.toast("删除成功");
   }
 }

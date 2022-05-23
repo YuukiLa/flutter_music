@@ -77,26 +77,39 @@ class MediaController extends GetxController {
     return song;
   }
 
-  Future<bool> createLocalPlaylist(String name) async {
-    var playlist = Playlist("",name,const Uuid().v4(),"",Platform.LOCAL);
+  Future<bool> createLocalPlaylist(String name, {String? id}) async {
+    id ??= const Uuid().v4();
+    var playlist = Playlist("", name, id, "", Platform.LOCAL);
     await StorageService.to.savePlaylist(playlist);
     return true;
   }
 
-  Future<bool> saveToLocalPlaylist(Song song,String id) async {
-    print(song.id+":"+id);
+  Future<bool> deleteLocalPlaylist(String id) async {
+    await StorageService.to.deletePlaylist(id);
+    return true;
+  }
+
+  Future<bool> saveToLocalPlaylist(Song song, String id) async {
+    print(song.id + ":" + id);
     var isExist = await StorageService.to.checkExistSongInPlayList(song.id, id);
-    if(isExist) {
+    if (isExist) {
       return false;
     }
-    song.url="";
+    song.url = "";
     StorageService.to.saveToPlayList(song, id);
     return true;
   }
-  Future<List<Song>> getLocalPlaylistSongs(String playlistId) async{
-    return await StorageService.to.getPlaylistSongs(playlistId);
+
+  Future<bool> collectToLocal(String name, List<Song> songs) async {
+    var id = const Uuid().v4();
+    await createLocalPlaylist(name, id: id);
+    await StorageService.to.saveAllToPlaylist(songs, id);
+    return true;
   }
 
+  Future<List<Song>> getLocalPlaylistSongs(String playlistId) async {
+    return await StorageService.to.getPlaylistSongs(playlistId);
+  }
 
   Future<PlaylistFilter> getFilter(String source) async {
     return await providers[source]!.playlistFilter();

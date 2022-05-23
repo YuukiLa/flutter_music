@@ -33,7 +33,8 @@ class SongListLogic extends GetxController {
     state.songs.addAll(res!);
     DialogUtil.dismiss();
   }
-  getLocal() async{
+
+  getLocal() async {
     var res = await MediaController.to.getLocalPlaylistSongs(state.id.value);
     state.image.value = "https://s1.ax1x.com/2022/05/06/Ouajdf.jpg";
     state.songs.addAll(res);
@@ -45,7 +46,7 @@ class SongListLogic extends GetxController {
     state.id.value = Get.arguments["id"] ?? "";
     state.title.value = Get.arguments["title"] ?? "";
     platform = Get.arguments["platform"] ?? "";
-    switch(type) {
+    switch (type) {
       case 0:
         getSongList();
         break;
@@ -76,15 +77,21 @@ class SongListLogic extends GetxController {
 
   onSongClick(int index) async {
     //TODO change to use playerservice
-    await MediaController.to.play(state.songs[index]);
+    // await MediaController.to.play(state.songs[index]);
+    PlayerService.instance.play(state.songs[index]);
     print(index);
   }
 
-  void collectToPlaylist(int index, String id) async{
-    if(await MediaController.to.saveToLocalPlaylist(state.songs[index], id)) {
+  void collectToPlaylist(int index, String id) async {
+    if (await MediaController.to.saveToLocalPlaylist(state.songs[index], id)) {
       DialogUtil.toast("已收藏");
-    }else {
+    } else {
       DialogUtil.toast("已存在该歌单中");
     }
+  }
+
+  collectPlaylist() async {
+    await MediaController.to.collectToLocal(state.title.value, state.songs);
+    DialogUtil.toast("已收藏歌单");
   }
 }

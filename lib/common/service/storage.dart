@@ -1,3 +1,4 @@
+import 'package:dio_log/dio_log.dart';
 import 'package:get/get.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
@@ -23,7 +24,8 @@ class StorageService extends GetxService {
     // _factory = databaseFactoryIo;
     _db = await databaseFactoryIo.openDatabase(join(dir.path, "song.db"));
     _store = intMapStoreFactory.store("song");
-    _playlistDb = await databaseFactoryIo.openDatabase(join(dir.path, "playlist.db"));
+    _playlistDb =
+        await databaseFactoryIo.openDatabase(join(dir.path, "playlist.db"));
     _playlistStore = intMapStoreFactory.store("playlist");
     _songsDb = await databaseFactoryIo.openDatabase(join(dir.path, "songs.db"));
     _songsStore = intMapStoreFactory.store("songs");
@@ -34,28 +36,53 @@ class StorageService extends GetxService {
     await _playlistStore.add(_playlistDb, playlist.toJson());
   }
 
-  Future<List<Playlist>> getPlaylists() async{
+  deletePlaylist(String id) async {
+    await _playlistStore.delete(_playlistDb,
+        finder: Finder(filter: Filter.equals("id", id)));
+    await _songsStore.delete(_songsDb,
+        finder: Finder(filter: Filter.equals("albumId", id)));
+  }
+
+  Future<List<Playlist>> getPlaylists() async {
     var list = await _playlistStore.find(_playlistDb);
 
     return list.map((e) => Playlist.fromJson(e.value)).toList();
   }
 
-  saveToPlayList(Song song,String id) {
+  saveToPlayList(Song song, String id) {
     song.albumId = id;
     _songsStore.add(_songsDb, song.toJson());
   }
 
-  Future<bool> checkExistSongInPlayList(String songId,String playlistId) async {
-    var record = await _songsStore.findFirst(_songsDb,
-        finder: Finder(filter: Filter.equals("id", songId) & Filter.equals("albumId", playlistId)));
-    return record!=null;
+  saveAllToPlaylist(List<Song> songs, String id) {
+    var eles = songs.map((e) {
+      e.albumId = id;
+      return e.toJson();
+    }).toList();
+    _songsStore.addAll(_songsDb, eles);
   }
 
-  Future<List<Song>> getPlaylistSongs(String playlistId) async{
-    var record = await _songsStore.find(_songsDb,finder: Finder(filter: Filter.equals("albumId", playlistId)));
+  deleteFromPlaylist(String songid, String playlistId) async {
+    await _songsStore.delete(_songsDb,
+        finder: Finder(
+            filter: Filter.equals("albumId", playlistId) &
+                Filter.equals("id", songid)));
+  }
+
+  Future<bool> checkExistSongInPlayList(
+      String songId, String playlistId) async {
+    var record = await _songsStore.findFirst(_songsDb,
+        finder: Finder(
+            filter: Filter.equals("id", songId) &
+                Filter.equals("albumId", playlistId)));
+    return record != null;
+  }
+
+  Future<List<Song>> getPlaylistSongs(String playlistId) async {
+    var record = await _songsStore.find(_songsDb,
+        finder: Finder(filter: Filter.equals("albumId", playlistId)));
     return record.map((e) => Song.fromJson(e.value)).toList();
   }
-
 
   saveSong(Song song) async {
     _store.add(_db, song.toJson());

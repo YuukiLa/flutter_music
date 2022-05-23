@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:unknown/common/enums/play_mode.dart';
+import 'package:unknown/common/enums/sp_key.dart';
 import 'package:unknown/common/service/media_service.dart';
+import 'package:unknown/common/service/sp_service.dart';
 import 'package:unknown/common/utils/dialog.dart';
 
 import '../model/song.dart';
@@ -22,13 +25,19 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
   final _emptySong = Song(
       "", "无播放源", "", "", "", "", "", "", "images/common/bet.png", 0, "", true);
   final _player = AudioPlayer();
-  final _songlist = <Song>[];
+  var _songlist = <Song>[];
   late Function _songChangeListener;
-  PlayMode _playMode=PlayMode.SEQUENCE;
+  PlayMode _playMode = PlayMode.SEQUENCE;
   int _curIndex = 0;
   //记录上一首的位置用于随机模式
   int _preIndex = 0;
   UnknownAudioPlayerHandler() {
+    String listStr = SpService.to.getString(SpKeyConst.playlistKey);
+    if (listStr != "") {
+      List<dynamic> tmp = jsonDecode(listStr);
+      _songlist = tmp.map((e) => Song.fromJson(e)).toList();
+    }
+    _curIndex = SpService.to.getInt(SpKeyConst.playIndexKey);
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
     _listenPlayEnd();
   }
@@ -53,11 +62,11 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
   }
 
   setPlayMode(PlayMode mode) {
-    _playMode=mode;
+    _playMode = mode;
   }
 
   setSongChangeListener(listener) {
-    _songChangeListener=listener;
+    _songChangeListener = listener;
   }
 
   _listenPlayEnd() {
@@ -92,6 +101,7 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
     final newQueue = queue.value..addAll(mediaitems.toList());
     queue.add(newQueue);
     readySongUrl();
+    savePlaylistToCache();
   }
 
   @override
@@ -106,19 +116,23 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
     if (song.url == "") {
       song = await MediaController.to.getSongUrl(song);
     }
-    if(song.url == "") {
+    if (song.url == "") {
       DialogUtil.toast("${song.title}应该要花钱...");
+      skipToNext();
     }
     var item = _song2MediaItem(song);
-    try{
+    try {
       await _player
           .setAudioSource(AudioSource.uri(Uri.parse(song.url), tag: item));
-    }catch(e) {
+    } catch (e) {
       DialogUtil.toast("${song.title}好像播放不了...");
+      song.url = "";
+      readySongUrl();
     }
 
     mediaItem.add(item);
     _songChangeListener(song);
+    SpService.to.setInt(SpKeyConst.playIndexKey, _curIndex);
     play();
   }
 
@@ -127,11 +141,14 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> skipToNext() async {
-    if(_playMode==PlayMode.RANDOM) {
-      _preIndex=_curIndex;
-      var nextInt = Random.secure().nextInt(_songlist.length-1);
-      _curIndex=nextInt;
-    }else {
+    if (_songlist.length < 1) {
+      return;
+    }
+    if (_playMode == PlayMode.RANDOM) {
+      _preIndex = _curIndex;
+      var nextInt = Random.secure().nextInt(_songlist.length - 1);
+      _curIndex = nextInt;
+    } else {
       if (_curIndex >= _songlist.length - 1) {
         _curIndex = 0;
       } else {
@@ -145,12 +162,15 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> skipToPrevious() async {
-    if(_playMode==PlayMode.RANDOM) {
-      if(_curIndex==_preIndex) {
-        _preIndex = Random.secure().nextInt(_songlist.length-1);
+    if (_songlist.length < 1) {
+      return;
+    }
+    if (_playMode == PlayMode.RANDOM) {
+      if (_curIndex == _preIndex) {
+        _preIndex = Random.secure().nextInt(_songlist.length - 1);
       }
-      _curIndex=_preIndex;
-    }else {
+      _curIndex = _preIndex;
+    } else {
       if (_curIndex <= 0) {
         _curIndex = _songlist.length - 1;
       } else {
@@ -173,6 +193,7 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
     // notify system
     final newQueue = queue.value..removeAt(index);
     queue.add(newQueue);
+    savePlaylistToCache();
   }
 
   @override
@@ -282,5 +303,10 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
       final newQueue = queue.value..insert(_curIndex, _song2MediaItem(song));
       queue.add(newQueue);
     }
+    savePlaylistToCache();
+  }
+
+  void savePlaylistToCache() {
+    SpService.to.setString(SpKeyConst.playlistKey, jsonEncode(_songlist));
   }
 }
