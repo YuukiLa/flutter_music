@@ -1,16 +1,15 @@
 # unknown
 
-A new Flutter project.unknown do what
+一个基于flutter的音乐播放器，可能不是很好用但是对我来说够了！
 
-## Getting Started
+## 完成了什么
 
-This project is a starting point for a Flutter application.
+1. qq+网易云
+2. cookie登录
+3. 。。。
 
-A few resources to get you started if this is your first Flutter project:
+## 感谢
+- [listen1](https://github.com/listen1/listen1_chrome_extension) 抄了他的接口
+- [flutter_NetEase_Music](https://github.com/liuhongcheng1998/flutter_NetEase_Music) 抄了他的播放器界面
+- 其他flutter包！
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
