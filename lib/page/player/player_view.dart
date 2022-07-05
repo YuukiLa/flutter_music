@@ -9,6 +9,7 @@ import 'package:unknown/common/service/player_service.dart';
 import 'package:unknown/common/utils/dialog.dart';
 import 'package:unknown/common/widget/image_menu.dart';
 import 'package:unknown/common/widget/song_progress.dart';
+import 'package:unknown/page/player/widget/lyric.dart';
 import 'package:unknown/page/player/widget/music_list.dart';
 
 import '../../common/model/song.dart';
@@ -150,7 +151,7 @@ class PlayerPage extends GetView<PlayerLogic> {
                             ),
                             // 歌词页
                             Container(
-                              child: Text("歌词"),
+                              child: Lyric(),
                             )
                             // LyricPage(model),
                           ],

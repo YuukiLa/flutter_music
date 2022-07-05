@@ -14,6 +14,7 @@ abstract class AbstractProvider {
   getUserInfo();
   getUserPlayList();
   getUserRecommand();
+  getLyric(String id);
   Future<List<Song>> search(String keyword, int currPage);
 
   String? getUrlParams(String key, String url) {
@@ -37,17 +38,18 @@ abstract class AbstractProvider {
 
     return map[key] ?? "";
   }
+
   addInterceptors(Dio dio) {
     dio.interceptors.add(InterceptorsWrapper(
         onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
-          print(
-              "\n================================= 请求数据 =================================");
-          print("method = ${options.method.toString()}");
-          print("url = ${options.uri.toString()}");
-          print("headers = ${options.headers}");
-          print("params = ${options.queryParameters}");
-          handler.next(options);
-        }, onResponse: (Response response, ResponseInterceptorHandler handler) {
+      print(
+          "\n================================= 请求数据 =================================");
+      print("method = ${options.method.toString()}");
+      print("url = ${options.uri.toString()}");
+      print("headers = ${options.headers}");
+      print("params = ${options.queryParameters}");
+      handler.next(options);
+    }, onResponse: (Response response, ResponseInterceptorHandler handler) {
       print(
           "\n================================= 响应数据开始 =================================");
       print("code = ${response.statusCode}");
@@ -65,6 +67,4 @@ abstract class AbstractProvider {
       handler.next(e);
     }));
   }
-
-
 }

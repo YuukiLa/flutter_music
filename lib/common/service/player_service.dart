@@ -16,6 +16,7 @@ class PlayerService extends GetxService {
   Rx<Song> currSong = Song("", "无播放源", "", "", "", "", "", "",
           "images/common/music.png", 0, "", true)
       .obs;
+  Rx<String> lyric = "".obs;
   UnknownAudioPlayerHandler get audioHandler => _audioHandler;
 
   Future<PlayerService> init() async {
@@ -34,6 +35,7 @@ class PlayerService extends GetxService {
     _listenSongChange();
     if (_audioHandler.songList.isNotEmpty) {
       currSong.value = _audioHandler.currPlaying;
+      lyric.value = _audioHandler.lyric;
     }
     return this;
   }
@@ -41,6 +43,7 @@ class PlayerService extends GetxService {
   void _listenSongChange() {
     _audioHandler.setSongChangeListener((Song song) {
       currSong.value = song;
+      lyric.value = _audioHandler.lyric;
     });
   }
 

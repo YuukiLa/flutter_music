@@ -26,6 +26,7 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
       "", "无播放源", "", "", "", "", "", "", "images/common/bet.png", 0, "", true);
   final _player = AudioPlayer();
   var _songlist = <Song>[];
+  String lyric = "";
   late Function _songChangeListener;
   PlayMode _playMode = PlayMode.SEQUENCE;
   int _curIndex = 0;
@@ -38,6 +39,9 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
       _songlist = tmp.map((e) => Song.fromJson(e)).toList();
     }
     _curIndex = SpService.to.getInt(SpKeyConst.playIndexKey);
+    lyric = SpService.to.getString(SpKeyConst.playLyric);
+    print("lyric");
+    print(lyric);
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
     _listenPlayEnd();
   }
@@ -54,6 +58,8 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
     if (song.url == "") {
       song = await MediaController.to.getSongUrl(song);
     }
+    lyric = await MediaController.to.getLyirc(song);
+    print(lyric);
     var item = _song2MediaItem(song);
     await _player
         .setAudioSource(AudioSource.uri(Uri.parse(song.url), tag: item));
@@ -129,10 +135,11 @@ class UnknownAudioPlayerHandler extends BaseAudioHandler
       song.url = "";
       readySongUrl();
     }
-
+    lyric = await MediaController.to.getLyirc(song);
     mediaItem.add(item);
     _songChangeListener(song);
     SpService.to.setInt(SpKeyConst.playIndexKey, _curIndex);
+    SpService.to.setString(SpKeyConst.playLyric, lyric);
     play();
   }
 

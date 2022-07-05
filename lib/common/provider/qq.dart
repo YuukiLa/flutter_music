@@ -186,6 +186,17 @@ class QQ extends AbstractProvider {
   }
 
   @override
+  getLyric(String id) async {
+    id = id.split("_")[1];
+    var target_url =
+        'https://i.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg?songmid=$id&g_tk=5381&format=json&inCharset=utf8&outCharset=utf-8&nobase64=1';
+    var resp = await Dio(dio.options.copyWith(responseType: ResponseType.plain))
+        .get(target_url);
+    var data = jsonDecode(resp.data);
+    return data["lyric"] ?? "";
+  }
+
+  @override
   Future<PlaylistFilter> playlistFilter() async {
     var target_url =
         'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_tag_conf.fcg' +

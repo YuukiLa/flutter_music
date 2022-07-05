@@ -3,6 +3,7 @@ class SpKeyConst {
   static String _user = "-user";
   static String playlistKey = "playingList";
   static String playIndexKey = "playingIndex";
+  static String playLyric = "playLyric";
 
   static String getCookieKey(String source) {
     return "$source$_cookie";

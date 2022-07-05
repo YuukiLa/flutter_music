@@ -119,6 +119,35 @@ class Netease extends AbstractProvider {
   }
 
   @override
+  getLyric(String id) async {
+    // use chrome extension to modify referer.
+    const target_url = 'https://music.163.com/weapi/song/lyric?csrf_token=';
+    const csrf = '';
+    var d = {
+      "id": id.split("_")[1],
+      "lv": -1,
+      "tv": -1,
+      "csrf_token": csrf,
+    };
+    var data = await weapi(convert.jsonEncode(d));
+    var resp = await dio.post(target_url, data: data);
+    Map<String, dynamic> respData = convert.jsonDecode(resp.data);
+    var lrc = "";
+    // var tlrc = "";
+    if (respData["lrc"] != null) {
+      lrc = respData["lrc"]["lyric"];
+    }
+    // if (respData["tlyric"] != null && respData["tlyric"]["lyric"] != null) {
+    //   // eslint-disable-next-line no-control-regex
+    //   RegExp(/(|\\)/g)
+    //   tlrc = respData["tlyric"]["lyric"].replaceAll(, '');
+
+    //   tlrc = tlrc.replace(/[\u2005]+/g, ' ');
+    // }
+    return lrc;
+  }
+
+  @override
   getPlaylist(String url) {
     print(url);
     var list_id = getUrlParams('list_id', url)?.split('_').first;
